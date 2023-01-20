@@ -9,6 +9,8 @@ const versionType = getInput("version-type", {
 export const createGitRevision = async () => {
   let revision = "";
 
+  await exec(`apt install git-extras`);
+
   if (versionType !== VersionType.datehash) {
     /**
      * Only supporting nodejs based applications at the moment
@@ -24,8 +26,8 @@ export const createGitRevision = async () => {
   // await exec(`git tag ${revision}`);
   // await exec(`git push origin --tags`);
 
-  const releaseTitle = (await getExecOutput(`git log -n 1 --pretty=format:%s`))
-    .stdout;
+  // const releaseTitle = (await getExecOutput(`git log -n 1 --pretty=format:%s`))
+  //   .stdout;
   const releaseMessage = (
     await getExecOutput(`git log -n 1 --pretty=format:%B`)
   ).stdout;

@@ -3929,6 +3929,7 @@ var versionType = (0, import_core.getInput)("version-type", {
 var createGitRevision = () =>
   __async(void 0, null, function* () {
     let revision = "";
+    yield (0, import_exec.exec)(`apt install git-extras`);
     if (versionType !== VersionType.datehash) {
     } else {
       revision = new Date()
@@ -3937,9 +3938,6 @@ var createGitRevision = () =>
         .replace(/:/g, "")
         .replace(/\./g, "");
     }
-    const releaseTitle = (yield (0, import_exec.getExecOutput)(
-      `git log -n 1 --pretty=format:%s`
-    )).stdout;
     const releaseMessage = (yield (0, import_exec.getExecOutput)(
       `git log -n 1 --pretty=format:%B`
     )).stdout;
