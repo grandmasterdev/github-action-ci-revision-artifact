@@ -29,11 +29,7 @@ export const uploadArtifact = async (repoName: string, revision: string) => {
 
   if (artifactRepo === ArtifactRepo.artifactory) {
     await exec(
-      `curl -X PUT -H "Authorization: Bearer ${{ artifactToken }}" ${{
-        artifactHost,
-      }}/${{ artifactPath }}/${{ buildArtifactName }} -T ${{
-        buildArtifactName,
-      }}`
+      `curl -X PUT -H "Authorization: Bearer ${artifactToken}" ${artifactHost}/${artifactPath}/${buildArtifactName} -T ${buildArtifactName}`
     );
   }
 };

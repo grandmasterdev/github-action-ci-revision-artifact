@@ -19642,11 +19642,7 @@ var uploadArtifact = (repoName, revision) =>
     yield (0, import_exec2.exec)(`cp ./build.zip ./${buildArtifactName}`);
     if (artifactRepo === ArtifactRepo.artifactory) {
       yield (0, import_exec2.exec)(
-        `curl -X PUT -H "Authorization: Bearer ${{ artifactToken }}" ${{
-          artifactHost,
-        }}/${{ artifactPath }}/${{ buildArtifactName }} -T ${{
-          buildArtifactName,
-        }}`
+        `curl -X PUT -H "Authorization: Bearer ${artifactToken}" ${artifactHost}/${artifactPath}/${buildArtifactName} -T ${buildArtifactName}`
       );
     }
   });
@@ -19659,7 +19655,7 @@ var ArtifactRepo = /* @__PURE__ */ ((ArtifactRepo2) => {
 var run = () =>
   __async(void 0, null, function* () {
     const output = yield createGitRevision();
-    yield uploadArtifact(output.repo, output.repo);
+    yield uploadArtifact(output.repo, output.revision);
   });
 
 // src/index.ts
