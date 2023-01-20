@@ -19644,7 +19644,9 @@ var uploadArtifact = (repoName, revision) =>
       yield (0, import_exec2.exec)(
         `curl -X PUT -H "Authorization: Bearer ${{ artifactToken }}" ${{
           artifactHost,
-        }}/${{ artifactPath }} -T ${{ buildArtifactName }}`
+        }}/${{ artifactPath }}/${{ buildArtifactName }} -T ${{
+          buildArtifactName,
+        }}`
       );
     }
   });
