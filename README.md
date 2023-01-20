@@ -4,10 +4,9 @@ Continuous Integration using **NodeJs** for packaging artifact
 
 ## What this does?
 
-It packages artifact before publishing it to the respective artifact repo using one of the following:
+It creates a git release and publish the build artifact to selected artifact repo.
 
-- zip
-- tar
+- artifactory (jFrog)
 
 ## How to use it
 
@@ -16,7 +15,7 @@ Create a step in your job that will use the action as follows:
 ```yaml
 -  uses: actions/checkout
 
--  uses: grandmasterdev/github-action-ci-nodejs-build-test@latest
+-  uses: grandmasterdev/github-action-ci-revision-artifact@latest
         with:
           working-dir: ${{github.workspace}}
 
@@ -51,7 +50,7 @@ With the above, you can then access the value of the working directory via the e
         echo "wd=${WD}" >> $GITHUB_ENV
       id: working-dir
 
-- uses: grandmasterdev/github-action-ci-nodejs-build-test@latest
+- uses: grandmasterdev/github-action-ci-revision-artifact@latest
       with:
         working-dir: ${{env.wd}}
 ```
@@ -59,18 +58,18 @@ With the above, you can then access the value of the working directory via the e
 or if you are using `context`
 
 ```yaml
-- uses: grandmasterdev/github-action-ci-nodejs-build-test@latest
+- uses: grandmasterdev/github-action-ci-revision-artifact@latest
       with:
         working-dir: ${{github.workspace}}
 ```
 
 ## Inputs
 
-| Name        | Description                                                                                                                  | Required?          |
-| ----------- | ---------------------------------------------------------------------------------------------------------------------------- | ------------------ |
-| working-dir | The directory where the code is being checkout                                                                               | :heavy_check_mark: |
-| packager    | The package option to use `zip` or `tar`                                                                                     | :heavy_check_mark: |
-| assets      | The files or folders to be included in the package. It has to be a string seperated by `,` (eg. dist,package.json,README.md) | :heavy_check_mark: |
+| Name          | Description                                            | Required?          |
+| ------------- | ------------------------------------------------------ | ------------------ |
+| working-dir   | The directory where the code is being checkout         | :heavy_check_mark: |
+| version-type  | The revision to use `semantic` or `datehash`           | :heavy_check_mark: |
+| artifact-repo | The desired artifact repo to upload the build artifact | :heavy_check_mark: |
 
 ## Outputs
 

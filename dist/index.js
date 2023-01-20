@@ -3937,14 +3937,13 @@ var createGitRevision = () =>
         .replace(/:/g, "")
         .replace(/\./g, "");
     }
-    yield (0, import_exec.exec)(`git tag ${revision}`);
-    yield (0, import_exec.exec)(`git push origin --tags`);
     const releaseTitle = (yield (0, import_exec.getExecOutput)(
       `git log -n 1 --pretty=format:%s`
     )).stdout;
     const releaseMessage = (yield (0, import_exec.getExecOutput)(
       `git log -n 1 --pretty=format:%B`
     )).stdout;
+    yield (0, import_exec.exec)(`git-release ${revision} -m ${releaseMessage}`);
     return revision;
   });
 var VersionType = /* @__PURE__ */ ((VersionType2) => {
