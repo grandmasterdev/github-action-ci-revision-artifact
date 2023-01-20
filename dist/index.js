@@ -2457,7 +2457,7 @@ var require_core = __commonJS({
       ] = `${inputPath}${path.delimiter}${process.env["PATH"]}`;
     }
     exports.addPath = addPath;
-    function getInput2(name, options) {
+    function getInput3(name, options) {
       const val =
         process.env[`INPUT_${name.replace(/ /g, "_").toUpperCase()}`] || "";
       if (options && options.required && !val) {
@@ -2468,9 +2468,9 @@ var require_core = __commonJS({
       }
       return val.trim();
     }
-    exports.getInput = getInput2;
+    exports.getInput = getInput3;
     function getMultilineInput(name, options) {
-      const inputs = getInput2(name, options)
+      const inputs = getInput3(name, options)
         .split("\n")
         .filter((x) => x !== "");
       if (options && options.trimWhitespace === false) {
@@ -2482,7 +2482,7 @@ var require_core = __commonJS({
     function getBooleanInput(name, options) {
       const trueValue = ["true", "True", "TRUE"];
       const falseValue = ["false", "False", "FALSE"];
-      const val = getInput2(name, options);
+      const val = getInput3(name, options);
       if (trueValue.includes(val)) return true;
       if (falseValue.includes(val)) return false;
       throw new TypeError(`Input does not meet YAML 1.2 "Core Schema" specification: ${name}
@@ -2956,7 +2956,7 @@ var require_io = __commonJS({
     var path = __importStar(require("path"));
     var util_1 = require("util");
     var ioUtil = __importStar(require_io_util());
-    var exec = util_1.promisify(childProcess.exec);
+    var exec2 = util_1.promisify(childProcess.exec);
     var execFile = util_1.promisify(childProcess.execFile);
     function cp(source, dest, options = {}) {
       return __awaiter(this, void 0, void 0, function* () {
@@ -3025,11 +3025,11 @@ var require_io = __commonJS({
           try {
             const cmdPath = ioUtil.getCmdPath();
             if (yield ioUtil.isDirectory(inputPath, true)) {
-              yield exec(`${cmdPath} /s /c "rd /s /q "%inputPath%""`, {
+              yield exec2(`${cmdPath} /s /c "rd /s /q "%inputPath%""`, {
                 env: { inputPath },
               });
             } else {
-              yield exec(`${cmdPath} /s /c "del /f /a "%inputPath%""`, {
+              yield exec2(`${cmdPath} /s /c "del /f /a "%inputPath%""`, {
                 env: { inputPath },
               });
             }
@@ -3848,7 +3848,7 @@ var require_exec = __commonJS({
     exports.getExecOutput = exports.exec = void 0;
     var string_decoder_1 = require("string_decoder");
     var tr = __importStar(require_toolrunner());
-    function exec(commandLine, args, options) {
+    function exec2(commandLine, args, options) {
       return __awaiter(this, void 0, void 0, function* () {
         const commandArgs = tr.argStringToArray(commandLine);
         if (commandArgs.length === 0) {
@@ -3860,7 +3860,7 @@ var require_exec = __commonJS({
         return runner.exec();
       });
     }
-    exports.exec = exec;
+    exports.exec = exec2;
     function getExecOutput2(commandLine, args, options) {
       var _a, _b;
       return __awaiter(this, void 0, void 0, function* () {
@@ -3901,7 +3901,7 @@ var require_exec = __commonJS({
           ),
           { stdout: stdOutListener, stderr: stdErrListener }
         );
-        const exitCode = yield exec(
+        const exitCode = yield exec2(
           commandLine,
           args,
           Object.assign(Object.assign({}, options), { listeners })
@@ -19604,7 +19604,10 @@ var createGitRevision = () =>
       generate_release_notes: true,
       name: releaseMessage,
     });
-    return revision;
+    return {
+      repo,
+      revision,
+    };
   });
 var VersionType = /* @__PURE__ */ ((VersionType2) => {
   VersionType2["semantic"] = "semantic";
@@ -19612,8 +19615,53 @@ var VersionType = /* @__PURE__ */ ((VersionType2) => {
   return VersionType2;
 })(VersionType || {});
 
+// src/artifact/index.ts
+var import_core2 = __toESM(require_core());
+var import_exec2 = __toESM(require_exec());
+var artifactRepo = (0, import_core2.getInput)("artifact-repo", {
+  required: true,
+});
+var artifactToken = (0, import_core2.getInput)("artifact-token", {
+  required: false,
+});
+var artifactHost = (0, import_core2.getInput)("artifact-host", {
+  required: true,
+});
+var artifactPath = (0, import_core2.getInput)("artifact-path", {
+  required: true,
+});
+var uploadArtifact = (repoName, revision) =>
+  __async(void 0, null, function* () {
+    if (!revision) {
+      throw new Error(`[uploadArtifact] missing revision!`);
+    }
+    if (!artifactRepo) {
+      throw new Error(`[uploadArtifact] missing artifact repo!`);
+    }
+    const buildArtifactName = `${repoName}-${revision}.zip`;
+    yield (0, import_exec2.exec)(`cp ./build.zip ./${buildArtifactName}`);
+    if (artifactRepo === ArtifactRepo.artifactory) {
+      yield (0, import_exec2.exec)(
+        `curl -X PUT -H "Authorization: Bearer ${{ artifactToken }}" ${{
+          artifactHost,
+        }}/${{ artifactPath }} -T ${{ buildArtifactName }}`
+      );
+    }
+  });
+var ArtifactRepo = /* @__PURE__ */ ((ArtifactRepo2) => {
+  ArtifactRepo2["artifactory"] = "artifactory";
+  return ArtifactRepo2;
+})(ArtifactRepo || {});
+
+// src/main.ts
+var run = () =>
+  __async(void 0, null, function* () {
+    const output = yield createGitRevision();
+    yield uploadArtifact(output.repo, output.repo);
+  });
+
 // src/index.ts
-createGitRevision();
+run();
 /*! Bundled license information:
 
 is-plain-object/dist/is-plain-object.js:

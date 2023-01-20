@@ -29,11 +29,6 @@ export const createGitRevision = async () => {
       .replace(/\./g, "");
   }
 
-  // await exec(`git tag ${revision}`);
-  // await exec(`git push origin --tags`);
-
-  // const releaseTitle = (await getExecOutput(`git log -n 1 --pretty=format:%s`))
-  //   .stdout;
   const releaseMessage = (
     await getExecOutput(`git log -n 1 --pretty=format:%B`)
   ).stdout;
@@ -45,9 +40,11 @@ export const createGitRevision = async () => {
     generate_release_notes: true,
     name: releaseMessage,
   });
-  // await exec(`git-release ${revision} -m ${releaseMessage}`);
 
-  return revision;
+  return {
+    repo,
+    revision,
+  };
 };
 
 export enum VersionType {

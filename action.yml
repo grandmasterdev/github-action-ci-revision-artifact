@@ -13,6 +13,15 @@ inputs:
     description: 'which repo to use to upload the build artifact. only supporting artifactory by jfrog at the moment.'
     required: true
     default: 'artifactory'
+  artifact-host:
+    description: 'the host of the artifact repo (eg. http://localhost:8081/artifactory)'
+    required: true
+  artifact-path:
+    description: 'the repo path to upload the build artifact'
+    required: true
+  artifact-token: 
+    description: 'the artifact host api token'
+    required: false
 
 outputs:
   is_updated:

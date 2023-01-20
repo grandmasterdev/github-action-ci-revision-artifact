@@ -18,6 +18,8 @@ Create a step in your job that will use the action as follows:
 -  uses: grandmasterdev/github-action-ci-revision-artifact@latest
         with:
           working-dir: ${{github.workspace}}
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
 ```
 
@@ -65,11 +67,14 @@ or if you are using `context`
 
 ## Inputs
 
-| Name          | Description                                            | Required?          |
-| ------------- | ------------------------------------------------------ | ------------------ |
-| working-dir   | The directory where the code is being checkout         | :heavy_check_mark: |
-| version-type  | The revision to use `semantic` or `datehash`           | :heavy_check_mark: |
-| artifact-repo | The desired artifact repo to upload the build artifact | :heavy_check_mark: |
+| Name           | Description                                                           | Required?          |
+| -------------- | --------------------------------------------------------------------- | ------------------ |
+| working-dir    | The directory where the code is being checkout                        | :heavy_check_mark: |
+| version-type   | The revision to use `semantic` or `datehash`                          | :heavy_check_mark: |
+| artifact-repo  | The desired artifact repo to upload the build artifact                | :heavy_check_mark: |
+| artifact-host  | the host of the artifact repo (eg. http://localhost:8081/artifactory) | :heavy_check_mark: |
+| artifact-path  | the repo path to upload the build artifact                            | :heavy_check_mark: |
+| artifact-token | the artifact host api token                                           | :x:                |
 
 ## Outputs
 

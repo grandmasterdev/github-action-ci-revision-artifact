@@ -1,3 +1,3 @@
-import { createGitRevision } from "./revision";
+import { run } from "./main";
 
-createGitRevision();
+run();
