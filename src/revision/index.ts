@@ -1,5 +1,6 @@
 import { getInput } from "@actions/core";
-import { getExecOutput, exec } from "@actions/exec";
+import { getExecOutput } from "@actions/exec";
+import { getOctokit, context } from "@actions/github";
 
 const versionType = getInput("version-type", {
   required: true,
@@ -7,9 +8,14 @@ const versionType = getInput("version-type", {
 });
 
 export const createGitRevision = async () => {
-  let revision = "";
+  if (!process.env.GITHUB_TOKEN) {
+    throw new Error(`[createGitRevision] no github token found in the env!`);
+  }
 
-  await exec(`apt install git-extras`);
+  const github = getOctokit(process.env.GITHUB_TOKEN);
+  const { repo, owner } = context.repo;
+
+  let revision = "";
 
   if (versionType !== VersionType.datehash) {
     /**
@@ -32,7 +38,14 @@ export const createGitRevision = async () => {
     await getExecOutput(`git log -n 1 --pretty=format:%B`)
   ).stdout;
 
-  await exec(`git-release ${revision} -m ${releaseMessage}`);
+  github.rest.repos.createRelease({
+    owner,
+    repo,
+    tag_name: revision,
+    generate_release_notes: true,
+    name: releaseMessage,
+  });
+  // await exec(`git-release ${revision} -m ${releaseMessage}`);
 
   return revision;
 };
