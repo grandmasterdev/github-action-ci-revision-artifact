@@ -1,3 +1,3 @@
-import { pack } from "./pack/pack";
+import { createGitRevision } from "./revision";
 
-pack();
+createGitRevision();

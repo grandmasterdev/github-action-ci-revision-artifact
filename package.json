@@ -1,7 +1,7 @@
 {
-  "name": "ci-nodejs-package",
+  "name": "ci-revision-artifact",
   "version": "1.0.0",
-  "description": "Package the artifact",
+  "description": "Update git with revision and upload packaged build to artifact repo",
   "main": "dist/index.js",
   "scripts": {
     "test": "jest",
@@ -47,6 +47,7 @@
   },
   "dependencies": {
     "@actions/core": "^1.10.0",
-    "@actions/exec": "^1.1.1"
+    "@actions/exec": "^1.1.1",
+    "@actions/github": "^5.1.1"
   }
 }

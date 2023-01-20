@@ -3861,7 +3861,7 @@ var require_exec = __commonJS({
       });
     }
     exports.exec = exec2;
-    function getExecOutput(commandLine, args, options) {
+    function getExecOutput2(commandLine, args, options) {
       var _a, _b;
       return __awaiter(this, void 0, void 0, function* () {
         let stdout = "";
@@ -3915,54 +3915,43 @@ var require_exec = __commonJS({
         };
       });
     }
-    exports.getExecOutput = getExecOutput;
+    exports.getExecOutput = getExecOutput2;
   },
 });
 
-// src/pack/pack.ts
+// src/revision/index.ts
 var import_core = __toESM(require_core());
 var import_exec = __toESM(require_exec());
-
-// src/utils/pack-util.ts
-var assertAssetPackageBreak = (assetList, breakType) => {
-  if (!assetList || assetList.length <= 0) {
-    throw new Error(`[assertAssetPackageBreak] Missing asset list to assert!`);
-  }
-  const newAssetList = [];
-  assetList.forEach((asset, index) => {
-    newAssetList.push(asset);
-    if (index < assetList.length - 1) {
-      if (breakType === "zip") {
-        newAssetList.push("-i");
-      }
-    }
-  });
-  return newAssetList;
-};
-
-// src/pack/pack.ts
-var packager = (0, import_core.getInput)("packager", {
+var versionType = (0, import_core.getInput)("version-type", {
   required: true,
+  trimWhitespace: true,
 });
-var assets = (0, import_core.getInput)("assets", {
-  required: true,
-});
-var pack = () =>
+var createGitRevision = () =>
   __async(void 0, null, function* () {
-    if (!assets) {
-      throw new Error(`[pack] No assets found to package!`);
+    let revision = "";
+    if (versionType !== VersionType.datehash) {
+    } else {
+      revision = new Date()
+        .toISOString()
+        .replace(/-/g, "")
+        .replace(/:/g, "")
+        .replace(/\./g, "");
     }
-    const assetList = assets.split(",");
-    if (!packager) {
-      throw new Error(`[pack] No packager selected!`);
-    }
-    const assetWithBreaker = assertAssetPackageBreak(assetList, packager);
-    const args =
-      packager === "tar"
-        ? assetWithBreaker
-        : ["-r", `build.${packager}`, "./", ...assetWithBreaker];
-    yield (0, import_exec.exec)(packager, args);
+    yield (0, import_exec.exec)(`git tag ${revision}`);
+    yield (0, import_exec.exec)(`git push origin --tags`);
+    const releaseTitle = (yield (0, import_exec.getExecOutput)(
+      `git log -n 1 --pretty=format:%s`
+    )).stdout;
+    const releaseMessage = (yield (0, import_exec.getExecOutput)(
+      `git log -n 1 --pretty=format:%B`
+    )).stdout;
+    return revision;
   });
+var VersionType = /* @__PURE__ */ ((VersionType2) => {
+  VersionType2["semantic"] = "semantic";
+  VersionType2["datehash"] = "datehash";
+  return VersionType2;
+})(VersionType || {});
 
 // src/index.ts
-pack();
+createGitRevision();
