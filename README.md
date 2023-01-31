@@ -77,6 +77,7 @@ or if you are using `context`
 | artifact-token   | The artifact host api token                                                                                                                                                              | :x:                |
 | main-branch      | The idenfier of which will be the main git repo branch that will be use for production release. Only needed if you wist to have different name of production vs non-production artifact. | :x:                |
 | artifact-postfix | The postfix that will be use for non-production artifact if "main-branch" is configured. If no value is set here it will default to standard naming.                                     | :x:                |
+| packager-type    | Define if it is a "zip" or "tar" package. If no value provided it will be defaulted to "zip"                                                                                             | :x:                |
 
 ## Outputs
 

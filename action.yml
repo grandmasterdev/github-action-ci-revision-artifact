@@ -19,6 +19,10 @@ inputs:
   artifact-path:
     description: 'The repo path to upload the build artifact'
     required: true
+  packager-type: 
+    description: 'Define if it is a "zip" or "tar" package. If no value provided it will be defaulted to "zip"'
+    require: false
+    default: 'zip'
   artifact-token: 
     description: 'The artifact host api token'
     required: false

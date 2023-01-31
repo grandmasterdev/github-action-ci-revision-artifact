@@ -19,6 +19,9 @@ const mainBranch = getInput("main-branch", {
 const artifactPostfix = getInput("artifact-postfix", {
   required: false,
 });
+const packagerType = getInput("packager-type", {
+  required: false,
+});
 
 export const uploadArtifact = async (repoName: string, revision: string) => {
   if (!revision) {
@@ -29,7 +32,13 @@ export const uploadArtifact = async (repoName: string, revision: string) => {
     throw new Error(`[uploadArtifact] missing artifact repo!`);
   }
 
-  let buildArtifactName = `${repoName}-${revision}.zip`;
+  let packageExtension = "zip";
+
+  if (packagerType) {
+    packageExtension = packagerType;
+  }
+
+  let buildArtifactName = `${repoName}-${revision}.${packageExtension}`;
 
   if (mainBranch) {
     buildArtifactName = `${repoName}-${revision}${
@@ -37,7 +46,7 @@ export const uploadArtifact = async (repoName: string, revision: string) => {
     }.zip`;
   }
 
-  await exec(`cp ./build.zip ./${buildArtifactName}`);
+  await exec(`cp ./build.${packageExtension} ./${buildArtifactName}`);
 
   if (artifactRepo === ArtifactRepo.artifactory) {
     await exec(

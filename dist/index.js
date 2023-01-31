@@ -19636,6 +19636,9 @@ var mainBranch = (0, import_core2.getInput)("main-branch", {
 var artifactPostfix = (0, import_core2.getInput)("artifact-postfix", {
   required: false,
 });
+var packagerType = (0, import_core2.getInput)("packager-type", {
+  required: false,
+});
 var uploadArtifact = (repoName, revision) =>
   __async(void 0, null, function* () {
     if (!revision) {
@@ -19644,13 +19647,18 @@ var uploadArtifact = (repoName, revision) =>
     if (!artifactRepo) {
       throw new Error(`[uploadArtifact] missing artifact repo!`);
     }
-    let buildArtifactName = `${repoName}-${revision}.zip`;
+    let packageExtension = "zip";
+    if (packagerType) {
+      packageExtension = packagerType;
+    }
+    let buildArtifactName = `${repoName}-${revision}.${packageExtension}`;
     if (mainBranch) {
       buildArtifactName = `${repoName}-${revision}${
         artifactPostfix ? "-" + artifactPostfix : ""
       }.zip`;
     }
-    yield (0, import_exec2.exec)(`cp ./build.zip ./${buildArtifactName}`);
+    yield (0,
+    import_exec2.exec)(`cp ./build.${packageExtension} ./${buildArtifactName}`);
     if (artifactRepo === ArtifactRepo.artifactory) {
       yield (0, import_exec2.exec)(
         `curl -X PUT -H "Authorization: Bearer ${artifactToken}" ${artifactHost}/${artifactPath}/${buildArtifactName} -T ${buildArtifactName}`
