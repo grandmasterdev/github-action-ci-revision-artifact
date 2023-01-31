@@ -19630,6 +19630,12 @@ var artifactHost = (0, import_core2.getInput)("artifact-host", {
 var artifactPath = (0, import_core2.getInput)("artifact-path", {
   required: true,
 });
+var mainBranch = (0, import_core2.getInput)("main-branch", {
+  required: false,
+});
+var artifactPostfix = (0, import_core2.getInput)("artifact-postfix", {
+  required: false,
+});
 var uploadArtifact = (repoName, revision) =>
   __async(void 0, null, function* () {
     if (!revision) {
@@ -19638,7 +19644,12 @@ var uploadArtifact = (repoName, revision) =>
     if (!artifactRepo) {
       throw new Error(`[uploadArtifact] missing artifact repo!`);
     }
-    const buildArtifactName = `${repoName}-${revision}.zip`;
+    let buildArtifactName = `${repoName}-${revision}.zip`;
+    if (mainBranch) {
+      buildArtifactName = `${repoName}-${revision}${
+        artifactPostfix ? "-" + artifactPostfix : ""
+      }.zip`;
+    }
     yield (0, import_exec2.exec)(`cp ./build.zip ./${buildArtifactName}`);
     if (artifactRepo === ArtifactRepo.artifactory) {
       yield (0, import_exec2.exec)(

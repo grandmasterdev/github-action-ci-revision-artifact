@@ -3,24 +3,30 @@ description: 'Update git with revision and upload packaged build to artifact rep
 
 inputs:
   working-dir:
-    description: 'the project working directory'
+    description: 'The project working directory'
     required: true
   version-type:
-    description: 'semantic versioning or datehash versioning'
+    description: 'Semantic versioning or datehash versioning'
     required: true
     default: 'datehash'
   artifact-repo:
-    description: 'which repo to use to upload the build artifact. only supporting artifactory by jfrog at the moment.'
+    description: 'Which repo to use to upload the build artifact. Only supporting artifactory by jfrog at the moment.'
     required: true
     default: 'artifactory'
   artifact-host:
-    description: 'the host of the artifact repo (eg. http://localhost:8081/artifactory)'
+    description: 'The host of the artifact repo (eg. http://localhost:8081/artifactory)'
     required: true
   artifact-path:
-    description: 'the repo path to upload the build artifact'
+    description: 'The repo path to upload the build artifact'
     required: true
   artifact-token: 
-    description: 'the artifact host api token'
+    description: 'The artifact host api token'
+    required: false
+  main-branch: 
+    description: 'The idenfier of which will be the main git repo branch that will be use for production release. Only needed if you wist to have different name of production vs non-production artifact.'
+    required: false
+  artifact-postfix: 
+    description: 'The postfix that will be use for non-production artifact if "main-branch" is configured. If no value is set here it will default to standard naming.'
     required: false
 
 outputs:

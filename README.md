@@ -67,14 +67,16 @@ or if you are using `context`
 
 ## Inputs
 
-| Name           | Description                                                           | Required?          |
-| -------------- | --------------------------------------------------------------------- | ------------------ |
-| working-dir    | The directory where the code is being checkout                        | :heavy_check_mark: |
-| version-type   | The revision to use `semantic` or `datehash`                          | :heavy_check_mark: |
-| artifact-repo  | The desired artifact repo to upload the build artifact                | :heavy_check_mark: |
-| artifact-host  | the host of the artifact repo (eg. http://localhost:8081/artifactory) | :heavy_check_mark: |
-| artifact-path  | the repo path to upload the build artifact                            | :heavy_check_mark: |
-| artifact-token | the artifact host api token                                           | :x:                |
+| Name             | Description                                                                                                                                                                              | Required?          |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------ |
+| working-dir      | The directory where the code is being checkout                                                                                                                                           | :heavy_check_mark: |
+| version-type     | The revision to use `semantic` or `datehash`                                                                                                                                             | :heavy_check_mark: |
+| artifact-repo    | The desired artifact repo to upload the build artifact                                                                                                                                   | :heavy_check_mark: |
+| artifact-host    | The host of the artifact repo (eg. http://localhost:8081/artifactory)                                                                                                                    | :heavy_check_mark: |
+| artifact-path    | The repo path to upload the build artifact                                                                                                                                               | :heavy_check_mark: |
+| artifact-token   | The artifact host api token                                                                                                                                                              | :x:                |
+| main-branch      | The idenfier of which will be the main git repo branch that will be use for production release. Only needed if you wist to have different name of production vs non-production artifact. | :x:                |
+| artifact-postfix | The postfix that will be use for non-production artifact if "main-branch" is configured. If no value is set here it will default to standard naming.                                     | :x:                |
 
 ## Outputs
 
