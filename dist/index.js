@@ -19655,7 +19655,7 @@ var uploadArtifact = (repoName, revision) =>
     if (mainBranch) {
       buildArtifactName = `${repoName}-${revision}${
         artifactPostfix ? "-" + artifactPostfix : ""
-      }.zip`;
+      }.${packageExtension}`;
     }
     yield (0,
     import_exec2.exec)(`cp ./build.${packageExtension} ./${buildArtifactName}`);

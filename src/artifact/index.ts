@@ -43,7 +43,7 @@ export const uploadArtifact = async (repoName: string, revision: string) => {
   if (mainBranch) {
     buildArtifactName = `${repoName}-${revision}${
       artifactPostfix ? "-" + artifactPostfix : ""
-    }.zip`;
+    }.${packageExtension}`;
   }
 
   await exec(`cp ./build.${packageExtension} ./${buildArtifactName}`);
