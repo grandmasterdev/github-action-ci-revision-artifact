@@ -10,8 +10,8 @@ inputs:
     required: true
     default: 'datehash'
   artifact-repo:
-    description: 'Which repo to use to upload the build artifact. Only supporting artifactory by jfrog at the moment.'
-    required: true
+    description: '"artifactory" (only supporting artifactory by jfrog for now)'
+    required: false
     default: 'artifactory'
   artifact-host:
     description: 'The host of the artifact repo (eg. http://localhost:8081/artifactory)'

@@ -2,7 +2,7 @@ import { getInput } from "@actions/core";
 import { exec } from "@actions/exec";
 
 const artifactRepo = getInput("artifact-repo", {
-  required: true,
+  required: false,
 });
 const artifactToken = getInput("artifact-token", {
   required: false,

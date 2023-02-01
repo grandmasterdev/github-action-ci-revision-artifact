@@ -19619,7 +19619,7 @@ var VersionType = /* @__PURE__ */ ((VersionType2) => {
 var import_core2 = __toESM(require_core());
 var import_exec2 = __toESM(require_exec());
 var artifactRepo = (0, import_core2.getInput)("artifact-repo", {
-  required: true,
+  required: false,
 });
 var artifactToken = (0, import_core2.getInput)("artifact-token", {
   required: false,
