@@ -19682,12 +19682,12 @@ var uploadArtifact = (repoName, revision) =>
         `curl -X PUT -H "Authorization: Bearer ${artifactToken}" ${artifactHost}/${artifactPath}/${buildArtifactName} -T ${buildArtifactFilename}`
       );
       if (output.stdout) {
-        const id = yield createBuildInfo(
+        yield createBuildInfo(
           buildArtifactName,
           revision,
           JSON.parse(output.stdout)
         );
-        yield uploadBuildInfo(buildArtifactFilename, id);
+        yield uploadBuildInfo();
       }
     }
   });
@@ -19724,10 +19724,10 @@ var createBuildInfo = (buildArtifactName, version2, artifactUploadReponse) =>
     });
     return id;
   });
-var uploadBuildInfo = (buildArtifactFilename, moduleName) =>
+var uploadBuildInfo = () =>
   __async(void 0, null, function* () {
     yield (0,
-    import_exec2.exec)(`curl -X PUT -H "Authorization: Bearer ${artifactToken}" ${artifactHost}/artifactory-build-info -T ${buildArtifactFilename}`);
+    import_exec2.exec)(`curl -X PUT -H "Authorization: Bearer ${artifactToken}" ${artifactHost}/artifactory-build-info -T build-info.json`);
   });
 var ArtifactRepo = /* @__PURE__ */ ((ArtifactRepo2) => {
   ArtifactRepo2["artifactory"] = "artifactory";

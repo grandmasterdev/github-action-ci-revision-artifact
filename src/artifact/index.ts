@@ -63,12 +63,12 @@ export const uploadArtifact = async (repoName: string, revision: string) => {
       /**
        * TODO: Get build info of the artifact version
        */
-      const id = await createBuildInfo(
+      await createBuildInfo(
         buildArtifactName,
         revision,
         JSON.parse(output.stdout)
       );
-      await uploadBuildInfo(buildArtifactFilename, id);
+      await uploadBuildInfo();
     }
   }
 };
@@ -114,12 +114,9 @@ const createBuildInfo = async (
   return id;
 };
 
-const uploadBuildInfo = async (
-  buildArtifactFilename: string,
-  moduleName: string
-) => {
+const uploadBuildInfo = async () => {
   await exec(
-    `curl -X PUT -H "Authorization: Bearer ${artifactToken}" ${artifactHost}/artifactory-build-info -T ${buildArtifactFilename}`
+    `curl -X PUT -H "Authorization: Bearer ${artifactToken}" ${artifactHost}/artifactory-build-info -T build-info.json`
   );
 };
 
