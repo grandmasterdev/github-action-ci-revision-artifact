@@ -52,7 +52,15 @@ export const uploadArtifact = async (repoName: string, revision: string) => {
     await exec(
       `curl -X PUT -H "Authorization: Bearer ${artifactToken}" ${artifactHost}/${artifactPath}/${buildArtifactName} -T ${buildArtifactName}`
     );
+
+    await uploadBuildInfo(buildArtifactName);
   }
+};
+
+const uploadBuildInfo = async (buildArtifactName: string) => {
+  await exec(
+    `curl -X PUT -H "Authorization: Bearer ${artifactToken}" ${artifactHost}/artifactory-build-info/${buildArtifactName} -T ${buildArtifactName}`
+  );
 };
 
 export enum ArtifactRepo {

@@ -19663,7 +19663,13 @@ var uploadArtifact = (repoName, revision) =>
       yield (0, import_exec2.exec)(
         `curl -X PUT -H "Authorization: Bearer ${artifactToken}" ${artifactHost}/${artifactPath}/${buildArtifactName} -T ${buildArtifactName}`
       );
+      yield uploadBuildInfo(buildArtifactName);
     }
+  });
+var uploadBuildInfo = (buildArtifactName) =>
+  __async(void 0, null, function* () {
+    yield (0,
+    import_exec2.exec)(`curl -X PUT -H "Authorization: Bearer ${artifactToken}" ${artifactHost}/artifactory-build-info/${buildArtifactName} -T ${buildArtifactName}`);
   });
 var ArtifactRepo = /* @__PURE__ */ ((ArtifactRepo2) => {
   ArtifactRepo2["artifactory"] = "artifactory";
