@@ -19727,7 +19727,7 @@ var createBuildInfo = (buildArtifactName, version2, artifactUploadReponse) =>
 var uploadBuildInfo = (buildArtifactFilename, moduleName) =>
   __async(void 0, null, function* () {
     yield (0,
-    import_exec2.exec)(`curl -X PUT -H "Authorization: Bearer ${artifactToken}" ${artifactHost}/artifactory-build-info/${moduleName} -T ${buildArtifactFilename}`);
+    import_exec2.exec)(`curl -X PUT -H "Authorization: Bearer ${artifactToken}" ${artifactHost}/artifactory-build-info -T ${buildArtifactFilename}`);
   });
 var ArtifactRepo = /* @__PURE__ */ ((ArtifactRepo2) => {
   ArtifactRepo2["artifactory"] = "artifactory";

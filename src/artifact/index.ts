@@ -119,7 +119,7 @@ const uploadBuildInfo = async (
   moduleName: string
 ) => {
   await exec(
-    `curl -X PUT -H "Authorization: Bearer ${artifactToken}" ${artifactHost}/artifactory-build-info/${moduleName} -T ${buildArtifactFilename}`
+    `curl -X PUT -H "Authorization: Bearer ${artifactToken}" ${artifactHost}/artifactory-build-info -T ${buildArtifactFilename}`
   );
 };
 
