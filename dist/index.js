@@ -19621,10 +19621,7 @@ var import_exec2 = __toESM(require_exec());
 var import_github2 = __toESM(require_github());
 
 // src/utils/artifactory-util.ts
-var generateBuildInfoModuleId = (repo, repoPath) => {
-  if (!repo) {
-    throw new Error(`[generateBuildInfoModuleId] Missing repo!`);
-  }
+var generateBuildInfoModuleId = (repoPath) => {
   if (!repoPath) {
     throw new Error(`[generateBuildInfoModuleId] Missing repo path`);
   }
@@ -19632,7 +19629,7 @@ var generateBuildInfoModuleId = (repo, repoPath) => {
   const cleanPaths = paths.filter((el) => {
     return el !== "" && el !== void 0 && el !== null;
   });
-  return `${repo}:${cleanPaths.join(":")}`;
+  return `${cleanPaths.join("::")}`;
 };
 
 // src/artifact/index.ts
@@ -19685,12 +19682,12 @@ var uploadArtifact = (repoName, revision) =>
         `curl -X PUT -H "Authorization: Bearer ${artifactToken}" ${artifactHost}/${artifactPath}/${buildArtifactName} -T ${buildArtifactFilename}`
       );
       if (output.stdout) {
-        yield createBuildInfo(
+        const id = yield createBuildInfo(
           buildArtifactName,
           revision,
           JSON.parse(output.stdout)
         );
-        yield uploadBuildInfo(buildArtifactName);
+        yield uploadBuildInfo(buildArtifactFilename, id);
       }
     }
   });
@@ -19699,6 +19696,7 @@ var createBuildInfo = (buildArtifactName, version2, artifactUploadReponse) =>
     const buildNumber = import_github2.context.runNumber;
     const { checksums, repo, path, mimeType } = artifactUploadReponse;
     const { sha1: sha12, md5: md52, sha256 } = checksums;
+    const id = generateBuildInfoModuleId(path);
     const buildInfo = {
       version: version2,
       name: buildArtifactName,
@@ -19707,7 +19705,7 @@ var createBuildInfo = (buildArtifactName, version2, artifactUploadReponse) =>
       url: `${import_github2.context.serverUrl}/${import_github2.context.repo.repo}/actions/runs/${import_github2.context.runId}/jobs/${import_github2.context.job}`,
       modules: [
         {
-          id: generateBuildInfoModuleId(repo, path),
+          id,
           artifacts: [
             {
               name: buildArtifactName,
@@ -19724,11 +19722,12 @@ var createBuildInfo = (buildArtifactName, version2, artifactUploadReponse) =>
     import_fs.writeFileSync)((0, import_path.join)("build-info.json"), JSON.stringify(buildInfo), {
       encoding: "utf8",
     });
+    return id;
   });
-var uploadBuildInfo = (buildArtifactName) =>
+var uploadBuildInfo = (buildArtifactFilename, moduleName) =>
   __async(void 0, null, function* () {
     yield (0,
-    import_exec2.exec)(`curl -X PUT -H "Authorization: Bearer ${artifactToken}" ${artifactHost}/artifactory-build-info/${buildArtifactName} -T ${buildArtifactName}`);
+    import_exec2.exec)(`curl -X PUT -H "Authorization: Bearer ${artifactToken}" ${artifactHost}/artifactory-build-info/${buildArtifactFilename} -T ${buildArtifactFilename}`);
   });
 var ArtifactRepo = /* @__PURE__ */ ((ArtifactRepo2) => {
   ArtifactRepo2["artifactory"] = "artifactory";
