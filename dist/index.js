@@ -3861,7 +3861,7 @@ var require_exec = __commonJS({
       });
     }
     exports.exec = exec2;
-    function getExecOutput2(commandLine, args, options) {
+    function getExecOutput3(commandLine, args, options) {
       var _a, _b;
       return __awaiter(this, void 0, void 0, function* () {
         let stdout = "";
@@ -3915,7 +3915,7 @@ var require_exec = __commonJS({
         };
       });
     }
-    exports.getExecOutput = getExecOutput2;
+    exports.getExecOutput = getExecOutput3;
   },
 });
 
@@ -19660,7 +19660,7 @@ var uploadArtifact = (repoName, revision) =>
     yield (0,
     import_exec2.exec)(`cp ./build.${packageExtension} ./${buildArtifactName}`);
     if (artifactRepo === ArtifactRepo.artifactory) {
-      const output = yield (0, import_exec2.exec)(
+      const output = yield (0, import_exec2.getExecOutput)(
         `curl -X PUT -H "Authorization: Bearer ${artifactToken}" ${artifactHost}/${artifactPath}/${buildArtifactName} -T ${buildArtifactName}`
       );
       console.log("####", output);

@@ -1,5 +1,5 @@
 import { getInput } from "@actions/core";
-import { exec } from "@actions/exec";
+import { exec, getExecOutput } from "@actions/exec";
 import { generateBuildInfoModuleId } from "../utils/artifactory-util";
 import { writeFileSync } from "fs";
 import { join } from "path";
@@ -52,7 +52,7 @@ export const uploadArtifact = async (repoName: string, revision: string) => {
   await exec(`cp ./build.${packageExtension} ./${buildArtifactName}`);
 
   if (artifactRepo === ArtifactRepo.artifactory) {
-    const output = await exec(
+    const output = await getExecOutput(
       `curl -X PUT -H "Authorization: Bearer ${artifactToken}" ${artifactHost}/${artifactPath}/${buildArtifactName} -T ${buildArtifactName}`
     );
 
