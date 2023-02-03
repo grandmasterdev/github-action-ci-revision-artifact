@@ -69,10 +69,10 @@ export const uploadArtifact = async (repoName: string, revision: string) => {
     filesToUpload = filesToUpload.concat(extraArtifactFilesArray);
   }
 
-  for (const file in filesToUpload) {
+  for (const i in filesToUpload) {
     if (artifactRepo === ArtifactRepo.artifactory) {
       const output = await getExecOutput(
-        `curl -X PUT -H "Authorization: Bearer ${artifactToken}" ${artifactHost}/${artifactPath}/${revision}/${file} -T ${file}`
+        `curl -X PUT -H "Authorization: Bearer ${artifactToken}" ${artifactHost}/${artifactPath}/${revision}/${filesToUpload[i]} -T ${filesToUpload[i]}`
       );
 
       if (output.stdout) {
