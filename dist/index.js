@@ -2956,7 +2956,7 @@ var require_io = __commonJS({
     var path = __importStar(require("path"));
     var util_1 = require("util");
     var ioUtil = __importStar(require_io_util());
-    var exec2 = util_1.promisify(childProcess.exec);
+    var exec3 = util_1.promisify(childProcess.exec);
     var execFile = util_1.promisify(childProcess.execFile);
     function cp(source, dest, options = {}) {
       return __awaiter(this, void 0, void 0, function* () {
@@ -3025,11 +3025,11 @@ var require_io = __commonJS({
           try {
             const cmdPath = ioUtil.getCmdPath();
             if (yield ioUtil.isDirectory(inputPath, true)) {
-              yield exec2(`${cmdPath} /s /c "rd /s /q "%inputPath%""`, {
+              yield exec3(`${cmdPath} /s /c "rd /s /q "%inputPath%""`, {
                 env: { inputPath },
               });
             } else {
-              yield exec2(`${cmdPath} /s /c "del /f /a "%inputPath%""`, {
+              yield exec3(`${cmdPath} /s /c "del /f /a "%inputPath%""`, {
                 env: { inputPath },
               });
             }
@@ -3848,7 +3848,7 @@ var require_exec = __commonJS({
     exports.getExecOutput = exports.exec = void 0;
     var string_decoder_1 = require("string_decoder");
     var tr = __importStar(require_toolrunner());
-    function exec2(commandLine, args, options) {
+    function exec3(commandLine, args, options) {
       return __awaiter(this, void 0, void 0, function* () {
         const commandArgs = tr.argStringToArray(commandLine);
         if (commandArgs.length === 0) {
@@ -3860,7 +3860,7 @@ var require_exec = __commonJS({
         return runner.exec();
       });
     }
-    exports.exec = exec2;
+    exports.exec = exec3;
     function getExecOutput3(commandLine, args, options) {
       var _a, _b;
       return __awaiter(this, void 0, void 0, function* () {
@@ -3901,7 +3901,7 @@ var require_exec = __commonJS({
           ),
           { stdout: stdOutListener, stderr: stdErrListener }
         );
-        const exitCode = yield exec2(
+        const exitCode = yield exec3(
           commandLine,
           args,
           Object.assign(Object.assign({}, options), { listeners })
@@ -19617,6 +19617,9 @@ var VersionType = /* @__PURE__ */ ((VersionType2) => {
 
 // src/artifact/index.ts
 var import_core2 = __toESM(require_core());
+var import_exec3 = __toESM(require_exec());
+
+// src/artifact/artifactory.ts
 var import_exec2 = __toESM(require_exec());
 var import_github2 = __toESM(require_github());
 
@@ -19632,9 +19635,98 @@ var generateBuildInfoModuleId = (repoPath, revision) => {
   return `${cleanPaths.join(":")}:${revision}`;
 };
 
-// src/artifact/index.ts
+// src/artifact/artifactory.ts
 var import_fs = require("fs");
 var import_path = require("path");
+var deploy = (props) =>
+  __async(void 0, null, function* () {
+    const {
+      artifactHost: artifactHost2,
+      artifactToken: artifactToken2,
+      artifactPath: artifactPath2,
+      revision,
+      filesToUpload,
+    } = props;
+    const artifactUploadResponses = [];
+    for (const i in filesToUpload) {
+      const output = yield (0, import_exec2.getExecOutput)(
+        `curl -X PUT -H "Authorization: Bearer ${artifactToken2}" ${artifactHost2}/${artifactPath2}/${revision}/${filesToUpload[i]} -T ${filesToUpload[i]}`
+      );
+      if (output.stdout) {
+        artifactUploadResponses.push({
+          filename: filesToUpload[i],
+          response: JSON.parse(output.stdout),
+        });
+      }
+    }
+    const artifacts = createBuildInfoModuleArtifacts({
+      version: revision,
+      artifactUploadResponses,
+    });
+    yield createBuildInfo({
+      revision,
+      artifacts,
+      artifactPath: artifactPath2,
+    });
+    yield uploadBuildInfo(artifactToken2, artifactHost2);
+  });
+var createBuildInfoModuleArtifacts = (props) => {
+  const { artifactUploadResponses } = props;
+  const moduleArtifacts = [];
+  for (const i in artifactUploadResponses) {
+    const { response, filename } = artifactUploadResponses[i];
+    const { checksums, path, mimeType } = response;
+    const { sha1: sha12, md5: md52, sha256 } = checksums;
+    moduleArtifacts.push({
+      name: filename,
+      sha1: sha12,
+      md5: md52,
+      sha256,
+      type: mimeType,
+      path,
+    });
+  }
+  return moduleArtifacts;
+};
+var createBuildInfo = (props) =>
+  __async(void 0, null, function* () {
+    const buildNumber = import_github2.context.runNumber;
+    const { revision, artifacts, artifactPath: artifactPath2 } = props;
+    const id = generateBuildInfoModuleId(artifactPath2, revision);
+    const buildInfo = {
+      version: revision,
+      name: id,
+      number: buildNumber,
+      started: new Date().toISOString(),
+      url: `${import_github2.context.serverUrl}/${import_github2.context.repo.repo}/actions/runs/${import_github2.context.runId}`,
+      buildAgent: {
+        name: "Pipeline",
+        version: "",
+      },
+      agent: {
+        name: "GithubAction",
+        version: "",
+      },
+      modules: [
+        {
+          id,
+          artifacts,
+        },
+      ],
+    };
+    (0,
+    import_fs.writeFileSync)((0, import_path.join)("build-info.json"), JSON.stringify(buildInfo), {
+      encoding: "utf8",
+    });
+    return id;
+  });
+var uploadBuildInfo = (artifactToken2, artifactHost2) =>
+  __async(void 0, null, function* () {
+    yield (0,
+    import_exec2.exec)(`curl -X PUT -H "Authorization: Bearer ${artifactToken2}" ${artifactHost2}/artifactory-build-info -T build-info.json`);
+  });
+
+// src/artifact/index.ts
 var artifactRepo = (0, import_core2.getInput)("artifact-repo", {
   required: false,
 });
@@ -19679,8 +19771,8 @@ var uploadArtifact = (repoName, revision) =>
     }
     const buildArtifactFilename = `${buildArtifactName}.${packageExtension}`;
     yield (0,
-    import_exec2.exec)(`cp ./build.${packageExtension} ./${buildArtifactFilename}`);
-    let filesToUpload = [`build.${packageExtension}`];
+    import_exec3.exec)(`cp ./build.${packageExtension} ./${buildArtifactFilename}`);
+    let filesToUpload = [`${buildArtifactFilename}`];
     if (extraArtifactFiles) {
       let extraArtifactFilesArray = extraArtifactFiles.split(",");
       extraArtifactFilesArray = extraArtifactFilesArray.filter((el) => {
@@ -19688,73 +19780,16 @@ var uploadArtifact = (repoName, revision) =>
       });
       filesToUpload = filesToUpload.concat(extraArtifactFilesArray);
     }
-    for (const i in filesToUpload) {
-      if (artifactRepo === ArtifactRepo.artifactory) {
-        const output = yield (0, import_exec2.getExecOutput)(
-          `curl -X PUT -H "Authorization: Bearer ${artifactToken}" ${artifactHost}/${artifactPath}/${revision}/${filesToUpload[i]} -T ${filesToUpload[i]}`
-        );
-        if (output.stdout) {
-          yield createBuildInfo(
-            buildArtifactName,
-            revision,
-            JSON.parse(output.stdout)
-          );
-          yield uploadBuildInfo();
-        }
-      }
+    if (artifactRepo === "artifactory" /* artifactory */) {
+      yield deploy({
+        artifactHost,
+        artifactPath,
+        artifactToken,
+        revision,
+        filesToUpload,
+      });
     }
   });
-var createBuildInfo = (buildArtifactName, version2, artifactUploadReponse) =>
-  __async(void 0, null, function* () {
-    const buildNumber = import_github2.context.runNumber;
-    const { checksums, path, mimeType } = artifactUploadReponse;
-    const { sha1: sha12, md5: md52, sha256 } = checksums;
-    const id = generateBuildInfoModuleId(path, version2);
-    const buildInfo = {
-      version: version2,
-      name: buildArtifactName,
-      number: buildNumber,
-      started: artifactUploadReponse.created,
-      url: `${import_github2.context.serverUrl}/${import_github2.context.repo.repo}/actions/runs/${import_github2.context.runId}`,
-      buildAgent: {
-        name: "Pipeline",
-        version: "",
-      },
-      agent: {
-        name: "GithubAction",
-        version: "",
-      },
-      modules: [
-        {
-          id,
-          artifacts: [
-            {
-              name: buildArtifactName,
-              type: mimeType,
-              sha1: sha12,
-              md5: md52,
-              sha256,
-              path,
-            },
-          ],
-        },
-      ],
-    };
-    (0,
-    import_fs.writeFileSync)((0, import_path.join)("build-info.json"), JSON.stringify(buildInfo), {
-      encoding: "utf8",
-    });
-    return id;
-  });
-var uploadBuildInfo = () =>
-  __async(void 0, null, function* () {
-    yield (0,
-    import_exec2.exec)(`curl -X PUT -H "Authorization: Bearer ${artifactToken}" ${artifactHost}/artifactory-build-info -T build-info.json`);
-  });
-var ArtifactRepo = /* @__PURE__ */ ((ArtifactRepo2) => {
-  ArtifactRepo2["artifactory"] = "artifactory";
-  return ArtifactRepo2;
-})(ArtifactRepo || {});
 
 // src/main.ts
 var run = () =>
