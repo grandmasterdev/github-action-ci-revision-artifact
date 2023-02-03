@@ -26,6 +26,9 @@ const artifactPostfix = getInput("artifact-postfix", {
 const packagerType = getInput("packager-type", {
   required: false,
 });
+const extraArtifactFiles = getInput("extra-artifact-files", {
+  required: false,
+});
 
 export const uploadArtifact = async (repoName: string, revision: string) => {
   if (!revision) {
@@ -54,21 +57,35 @@ export const uploadArtifact = async (repoName: string, revision: string) => {
 
   await exec(`cp ./build.${packageExtension} ./${buildArtifactFilename}`);
 
-  if (artifactRepo === ArtifactRepo.artifactory) {
-    const output = await getExecOutput(
-      `curl -X PUT -H "Authorization: Bearer ${artifactToken}" ${artifactHost}/${artifactPath}/${buildArtifactName} -T ${buildArtifactFilename}`
-    );
+  let filesToUpload = [`build.${packageExtension}`];
 
-    if (output.stdout) {
-      /**
-       * TODO: Get build info of the artifact version
-       */
-      await createBuildInfo(
-        buildArtifactName,
-        revision,
-        JSON.parse(output.stdout)
+  if (extraArtifactFiles) {
+    let extraArtifactFilesArray = extraArtifactFiles.split(",");
+
+    extraArtifactFilesArray = extraArtifactFilesArray.filter((el) => {
+      return el.trim();
+    });
+
+    filesToUpload = filesToUpload.concat(extraArtifactFilesArray);
+  }
+
+  for (const file in filesToUpload) {
+    if (artifactRepo === ArtifactRepo.artifactory) {
+      const output = await getExecOutput(
+        `curl -X PUT -H "Authorization: Bearer ${artifactToken}" ${artifactHost}/${artifactPath}/${revision}/${file} -T ${file}`
       );
-      await uploadBuildInfo();
+
+      if (output.stdout) {
+        /**
+         * TODO: Fix module id not appearing in build info
+         */
+        await createBuildInfo(
+          buildArtifactName,
+          revision,
+          JSON.parse(output.stdout)
+        );
+        await uploadBuildInfo();
+      }
     }
   }
 };
@@ -80,17 +97,25 @@ const createBuildInfo = async (
 ) => {
   const buildNumber = context.runNumber;
 
-  const { checksums, repo, path, mimeType } = artifactUploadReponse;
+  const { checksums, path, mimeType } = artifactUploadReponse;
   const { sha1, md5, sha256 } = checksums;
 
-  const id = generateBuildInfoModuleId(path);
+  const id = generateBuildInfoModuleId(path, version);
 
   const buildInfo: ArtifactoryBuildInfo = {
     version,
     name: buildArtifactName,
     number: buildNumber,
     started: artifactUploadReponse.created,
-    url: `${context.serverUrl}/${context.repo.repo}/actions/runs/${context.runId}/jobs/${context.job}`,
+    url: `${context.serverUrl}/${context.repo.repo}/actions/runs/${context.runId}`,
+    buildAgent: {
+      name: "Pipeline",
+      version: "",
+    },
+    agent: {
+      name: "GithubAction",
+      version: "",
+    },
     modules: [
       {
         id,
@@ -101,6 +126,7 @@ const createBuildInfo = async (
             sha1,
             md5,
             sha256,
+            path,
           },
         ],
       },
@@ -149,7 +175,19 @@ export type ArtifactoryBuildInfo = {
   number: number;
   started: string;
   url: string;
+  buildAgent?: ArtifactoryBuildInfoBuildAgent;
+  agent?: ArtifactoryBuildInfoAgent;
   modules: ArtifactoryBuildInfoModule[];
+};
+
+export type ArtifactoryBuildInfoBuildAgent = {
+  name: string;
+  version: string;
+};
+
+export type ArtifactoryBuildInfoAgent = {
+  name: string;
+  version: string;
 };
 
 export type ArtifactoryBuildInfoModule = {
@@ -163,4 +201,5 @@ export type ArtifactoryBuildInfoArtifact = {
   sha256: string;
   name: string;
   type: string;
+  path: string;
 };

@@ -1,4 +1,7 @@
-export const generateBuildInfoModuleId = (repoPath: string) => {
+export const generateBuildInfoModuleId = (
+  repoPath: string,
+  revision: string
+) => {
   if (!repoPath) {
     throw new Error(`[generateBuildInfoModuleId] Missing repo path`);
   }
@@ -6,8 +9,8 @@ export const generateBuildInfoModuleId = (repoPath: string) => {
   const paths = repoPath.split("/");
 
   const cleanPaths = paths.filter((el) => {
-    return el !== "" && el !== undefined && el !== null;
+    return el !== "" && el !== undefined && el !== null && el !== revision;
   });
 
-  return `${cleanPaths.join("::")}`;
+  return `${cleanPaths.join(":")}:${revision}`;
 };

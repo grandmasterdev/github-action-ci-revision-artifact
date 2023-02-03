@@ -32,6 +32,9 @@ inputs:
   artifact-postfix: 
     description: 'The postfix that will be use for non-production artifact if "main-branch" is configured. If no value is set here it will default to standard naming.'
     required: false
+  extra-artifact-files:
+    description: 'The files that will be uploaded as artifacts other than "build.<extension>". Multiple artifacts must be "," seperated (eg. "asset.tar, script.sh"). Default would be "build.<ext>" if no value is provided.'
+    required: false
 
 outputs:
   is_updated:

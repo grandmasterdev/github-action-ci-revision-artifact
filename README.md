@@ -67,17 +67,18 @@ or if you are using `context`
 
 ## Inputs
 
-| Name             | Description                                                                                                                                                                              | Required?          |
-| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------ |
-| working-dir      | The directory where the code is being checkout                                                                                                                                           | :heavy_check_mark: |
-| version-type     | The revision to use `semantic` or `datehash`                                                                                                                                             | :heavy_check_mark: |
-| artifact-repo    | "artifactory" (only supporting artifactory for now). Default to "artifactory"                                                                                                            | :x:                |
-| artifact-host    | The host of the artifact repo (eg. http://localhost:8081/artifactory)                                                                                                                    | :heavy_check_mark: |
-| artifact-path    | The repo path to upload the build artifact                                                                                                                                               | :heavy_check_mark: |
-| artifact-token   | The artifact host api token                                                                                                                                                              | :x:                |
-| main-branch      | The idenfier of which will be the main git repo branch that will be use for production release. Only needed if you wist to have different name of production vs non-production artifact. | :x:                |
-| artifact-postfix | The postfix that will be use for non-production artifact if "main-branch" is configured. If no value is set here it will default to standard naming.                                     | :x:                |
-| packager-type    | Define if it is a "zip" or "tar" package. If no value provided it will be defaulted to "zip"                                                                                             | :x:                |
+| Name                 | Description                                                                                                                                                                                                 | Required?          |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------ |
+| working-dir          | The directory where the code is being checkout                                                                                                                                                              | :heavy_check_mark: |
+| version-type         | The revision to use `semantic` or `datehash`                                                                                                                                                                | :heavy_check_mark: |
+| artifact-repo        | "artifactory" (only supporting artifactory for now). Default to "artifactory"                                                                                                                               | :x:                |
+| artifact-host        | The host of the artifact repo (eg. http://localhost:8081/artifactory)                                                                                                                                       | :heavy_check_mark: |
+| artifact-path        | The repo path to upload the build artifact                                                                                                                                                                  | :heavy_check_mark: |
+| artifact-token       | The artifact host api token                                                                                                                                                                                 | :x:                |
+| main-branch          | The idenfier of which will be the main git repo branch that will be use for production release. Only needed if you wist to have different name of production vs non-production artifact.                    | :x:                |
+| artifact-postfix     | The postfix that will be use for non-production artifact if "main-branch" is configured. If no value is set here it will default to standard naming.                                                        | :x:                |
+| packager-type        | Define if it is a "zip" or "tar" package. If no value provided it will be defaulted to "zip"                                                                                                                | :x:                |
+| extra-artifact-files | The files that will be uploaded as artifacts other than "build.<extension>". Multiple artifacts must be "," seperated (eg. "asset.tar, script.sh"). Default would be "build.<ext>" if no value is provided. | :x:                |
 
 ## Outputs
 

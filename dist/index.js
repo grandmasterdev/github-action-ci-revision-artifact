@@ -19621,15 +19621,15 @@ var import_exec2 = __toESM(require_exec());
 var import_github2 = __toESM(require_github());
 
 // src/utils/artifactory-util.ts
-var generateBuildInfoModuleId = (repoPath) => {
+var generateBuildInfoModuleId = (repoPath, revision) => {
   if (!repoPath) {
     throw new Error(`[generateBuildInfoModuleId] Missing repo path`);
   }
   const paths = repoPath.split("/");
   const cleanPaths = paths.filter((el) => {
-    return el !== "" && el !== void 0 && el !== null;
+    return el !== "" && el !== void 0 && el !== null && el !== revision;
   });
-  return `${cleanPaths.join("::")}`;
+  return `${cleanPaths.join(":")}:${revision}`;
 };
 
 // src/artifact/index.ts
@@ -19656,6 +19656,9 @@ var artifactPostfix = (0, import_core2.getInput)("artifact-postfix", {
 var packagerType = (0, import_core2.getInput)("packager-type", {
   required: false,
 });
+var extraArtifactFiles = (0, import_core2.getInput)("extra-artifact-files", {
+  required: false,
+});
 var uploadArtifact = (repoName, revision) =>
   __async(void 0, null, function* () {
     if (!revision) {
@@ -19677,32 +19680,50 @@ var uploadArtifact = (repoName, revision) =>
     const buildArtifactFilename = `${buildArtifactName}.${packageExtension}`;
     yield (0,
     import_exec2.exec)(`cp ./build.${packageExtension} ./${buildArtifactFilename}`);
-    if (artifactRepo === ArtifactRepo.artifactory) {
-      const output = yield (0, import_exec2.getExecOutput)(
-        `curl -X PUT -H "Authorization: Bearer ${artifactToken}" ${artifactHost}/${artifactPath}/${buildArtifactName} -T ${buildArtifactFilename}`
-      );
-      if (output.stdout) {
-        yield createBuildInfo(
-          buildArtifactName,
-          revision,
-          JSON.parse(output.stdout)
+    let filesToUpload = [`build.${packageExtension}`];
+    if (extraArtifactFiles) {
+      let extraArtifactFilesArray = extraArtifactFiles.split(",");
+      extraArtifactFilesArray = extraArtifactFilesArray.filter((el) => {
+        return el.trim();
+      });
+      filesToUpload = filesToUpload.concat(extraArtifactFilesArray);
+    }
+    for (const file in filesToUpload) {
+      if (artifactRepo === ArtifactRepo.artifactory) {
+        const output = yield (0, import_exec2.getExecOutput)(
+          `curl -X PUT -H "Authorization: Bearer ${artifactToken}" ${artifactHost}/${artifactPath}/${revision}/${file} -T ${file}`
         );
-        yield uploadBuildInfo();
+        if (output.stdout) {
+          yield createBuildInfo(
+            buildArtifactName,
+            revision,
+            JSON.parse(output.stdout)
+          );
+          yield uploadBuildInfo();
+        }
       }
     }
   });
 var createBuildInfo = (buildArtifactName, version2, artifactUploadReponse) =>
   __async(void 0, null, function* () {
     const buildNumber = import_github2.context.runNumber;
-    const { checksums, repo, path, mimeType } = artifactUploadReponse;
+    const { checksums, path, mimeType } = artifactUploadReponse;
     const { sha1: sha12, md5: md52, sha256 } = checksums;
-    const id = generateBuildInfoModuleId(path);
+    const id = generateBuildInfoModuleId(path, version2);
     const buildInfo = {
       version: version2,
       name: buildArtifactName,
       number: buildNumber,
       started: artifactUploadReponse.created,
-      url: `${import_github2.context.serverUrl}/${import_github2.context.repo.repo}/actions/runs/${import_github2.context.runId}/jobs/${import_github2.context.job}`,
+      url: `${import_github2.context.serverUrl}/${import_github2.context.repo.repo}/actions/runs/${import_github2.context.runId}`,
+      buildAgent: {
+        name: "Pipeline",
+        version: "",
+      },
+      agent: {
+        name: "GithubAction",
+        version: "",
+      },
       modules: [
         {
           id,
@@ -19713,6 +19734,7 @@ var createBuildInfo = (buildArtifactName, version2, artifactUploadReponse) =>
               sha1: sha12,
               md5: md52,
               sha256,
+              path,
             },
           ],
         },
