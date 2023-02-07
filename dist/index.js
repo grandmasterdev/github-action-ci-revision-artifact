@@ -19624,15 +19624,15 @@ var import_exec2 = __toESM(require_exec());
 var import_github2 = __toESM(require_github());
 
 // src/utils/artifactory-util.ts
-var generateBuildInfoModuleId = (repoPath, revision) => {
+var generateBuildInfoModuleId = (repoPath, branch) => {
   if (!repoPath) {
     throw new Error(`[generateBuildInfoModuleId] Missing repo path`);
   }
   const paths = repoPath.split("/");
   const cleanPaths = paths.filter((el) => {
-    return el !== "" && el !== void 0 && el !== null && el !== revision;
+    return el !== "" && el !== void 0 && el !== null && el !== branch;
   });
-  return `${cleanPaths.join(":")}:${revision}`;
+  return `${cleanPaths.join(":")}:${branch}`;
 };
 
 // src/artifact/artifactory.ts
@@ -19640,6 +19640,7 @@ var import_fs = require("fs");
 var import_path = require("path");
 var deploy = (props) =>
   __async(void 0, null, function* () {
+    const startTime = new Date();
     const {
       artifactHost: artifactHost2,
       artifactToken: artifactToken2,
@@ -19667,6 +19668,7 @@ var deploy = (props) =>
       revision,
       artifacts,
       artifactPath: artifactPath2,
+      startTime,
     });
     yield uploadBuildInfo(artifactToken2, artifactHost2);
   });
@@ -19691,13 +19693,23 @@ var createBuildInfoModuleArtifacts = (props) => {
 var createBuildInfo = (props) =>
   __async(void 0, null, function* () {
     const buildNumber = import_github2.context.runNumber;
-    const { revision, artifacts, artifactPath: artifactPath2 } = props;
-    const id = generateBuildInfoModuleId(artifactPath2, revision);
+    const gitRef = import_github2.context.ref;
+    const gitRefParts = gitRef.split("/");
+    const branch = gitRefParts[gitRefParts.length - 1];
+    const {
+      revision,
+      artifacts,
+      artifactPath: artifactPath2,
+      startTime,
+    } = props;
+    const id = generateBuildInfoModuleId(artifactPath2, branch);
+    const durationMillis = new Date().getTime() - startTime.getTime();
     const buildInfo = {
       version: revision,
       name: id,
       number: buildNumber,
-      started: new Date().toISOString(),
+      started: startTime.toISOString(),
+      durationMillis,
       url: `${import_github2.context.serverUrl}/${import_github2.context.repo.repo}/actions/runs/${import_github2.context.runId}`,
       buildAgent: {
         name: "Pipeline",
