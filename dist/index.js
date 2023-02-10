@@ -19843,7 +19843,7 @@ var uploadArtifact = (repoName, revision) =>
     const branch = gitRefParts[gitRefParts.length - 1];
     console.log("mainBranch", mainBranch);
     console.log("branch", branch);
-    if (mainBranch && mainBranch === branch) {
+    if (mainBranch && mainBranch !== branch) {
       buildArtifactName = artifactPostfix
         ? `${repoName}-${revision}"-"${artifactPostfix}`
         : `${repoName}-${revision}`;
