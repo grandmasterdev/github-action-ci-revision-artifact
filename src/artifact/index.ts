@@ -1,5 +1,6 @@
 import { getInput } from "@actions/core";
 import { exec } from "@actions/exec";
+import { context } from "@actions/github";
 import { ArtifactRepo, deploy } from "./artifactory";
 
 const artifactRepo = getInput("artifact-repo", {
@@ -50,7 +51,11 @@ export const uploadArtifact = async (repoName: string, revision: string) => {
 
   let buildArtifactName = `${repoName}-${revision}`;
 
-  if (!mainBranch) {
+  const gitRef = context.ref;
+  const gitRefParts = gitRef.split("/");
+  const branch = gitRefParts[gitRefParts.length - 1];
+
+  if (mainBranch && mainBranch === branch) {
     buildArtifactName = `${repoName}-${revision}${
       artifactPostfix ? "-" + artifactPostfix : ""
     }`;
