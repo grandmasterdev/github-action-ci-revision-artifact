@@ -3,8 +3,28 @@ var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getOwnPropSymbols = Object.getOwnPropertySymbols;
 var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __propIsEnum = Object.prototype.propertyIsEnumerable;
+var __defNormalProp = (obj, key, value) =>
+  key in obj
+    ? __defProp(obj, key, {
+        enumerable: true,
+        configurable: true,
+        writable: true,
+        value,
+      })
+    : (obj[key] = value);
+var __spreadValues = (a, b) => {
+  for (var prop in (b ||= {}))
+    if (__hasOwnProp.call(b, prop)) __defNormalProp(a, prop, b[prop]);
+  if (__getOwnPropSymbols)
+    for (var prop of __getOwnPropSymbols(b)) {
+      if (__propIsEnum.call(b, prop)) __defNormalProp(a, prop, b[prop]);
+    }
+  return a;
+};
 var __esm = (fn, res) =>
   function __init() {
     return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])((fn = 0))), res;
@@ -19634,6 +19654,22 @@ var generateBuildInfoModuleId = (repoPath, branch) => {
   });
   return `${cleanPaths.join(":")}:${branch}`;
 };
+var generateCurlCredential = (props) => {
+  const {
+    artifactToken: artifactToken2,
+    artifactUsername: artifactUsername2,
+    artifactPassword: artifactPassword2,
+  } = props;
+  if (artifactToken2) {
+    return `-H "Authorization: Bearer ${artifactToken2}"`;
+  }
+  if (artifactUsername2 && artifactPassword2) {
+    return `-u ${artifactUsername2}:${artifactPassword2}`;
+  }
+  throw new Error(
+    `[generateCurlCredential] no required props is/are available!`
+  );
+};
 
 // src/artifact/artifactory.ts
 var import_fs = require("fs");
@@ -19644,6 +19680,8 @@ var deploy = (props) =>
     const {
       artifactHost: artifactHost2,
       artifactToken: artifactToken2,
+      artifactUsername: artifactUsername2,
+      artifactPassword: artifactPassword2,
       artifactPath: artifactPath2,
       revision,
       filesToUpload,
@@ -19670,7 +19708,14 @@ var deploy = (props) =>
       artifactPath: artifactPath2,
       startTime,
     });
-    yield uploadBuildInfo(artifactToken2, artifactHost2);
+    yield uploadBuildInfo(
+      {
+        artifactUsername: artifactUsername2,
+        artifactPassword: artifactPassword2,
+        artifactToken: artifactToken2,
+      },
+      artifactHost2
+    );
   });
 var createBuildInfoModuleArtifacts = (props) => {
   const { artifactUploadResponses } = props;
@@ -19732,10 +19777,13 @@ var createBuildInfo = (props) =>
     });
     return id;
   });
-var uploadBuildInfo = (artifactToken2, artifactHost2) =>
+var uploadBuildInfo = (credentials, artifactHost2) =>
   __async(void 0, null, function* () {
+    const credentialStr = generateCurlCredential(
+      __spreadValues({}, credentials)
+    );
     yield (0,
-    import_exec2.exec)(`curl -X PUT -H "Authorization: Bearer ${artifactToken2}" ${artifactHost2}/artifactory-build-info -T build-info.json`);
+    import_exec2.exec)(`curl -X PUT ${credentialStr} ${artifactHost2}/artifactory-build-info -T build-info.json`);
   });
 
 // src/artifact/index.ts
@@ -19743,6 +19791,12 @@ var artifactRepo = (0, import_core2.getInput)("artifact-repo", {
   required: false,
 });
 var artifactToken = (0, import_core2.getInput)("artifact-token", {
+  required: false,
+});
+var artifactUsername = (0, import_core2.getInput)("artifact-username", {
+  required: false,
+});
+var artifactPassword = (0, import_core2.getInput)("artifact-password", {
   required: false,
 });
 var artifactHost = (0, import_core2.getInput)("artifact-host", {
@@ -19776,10 +19830,10 @@ var uploadArtifact = (repoName, revision) =>
       packageExtension = packagerType;
     }
     let buildArtifactName = `${repoName}-${revision}`;
-    if (mainBranch) {
+    if (!mainBranch) {
       buildArtifactName = `${repoName}-${revision}${
         artifactPostfix ? "-" + artifactPostfix : ""
-      }.${packageExtension}`;
+      }`;
     }
     const buildArtifactFilename = `${buildArtifactName}.${packageExtension}`;
     yield (0,
@@ -19797,6 +19851,8 @@ var uploadArtifact = (repoName, revision) =>
         artifactHost,
         artifactPath,
         artifactToken,
+        artifactUsername,
+        artifactPassword,
         revision,
         filesToUpload,
       });

@@ -8,6 +8,12 @@ const artifactRepo = getInput("artifact-repo", {
 const artifactToken = getInput("artifact-token", {
   required: false,
 });
+const artifactUsername = getInput("artifact-username", {
+  required: false,
+});
+const artifactPassword = getInput("artifact-password", {
+  required: false,
+});
 const artifactHost = getInput("artifact-host", {
   required: true,
 });
@@ -44,10 +50,10 @@ export const uploadArtifact = async (repoName: string, revision: string) => {
 
   let buildArtifactName = `${repoName}-${revision}`;
 
-  if (mainBranch) {
+  if (!mainBranch) {
     buildArtifactName = `${repoName}-${revision}${
       artifactPostfix ? "-" + artifactPostfix : ""
-    }.${packageExtension}`;
+    }`;
   }
 
   const buildArtifactFilename = `${buildArtifactName}.${packageExtension}`;
@@ -71,6 +77,8 @@ export const uploadArtifact = async (repoName: string, revision: string) => {
       artifactHost,
       artifactPath,
       artifactToken,
+      artifactUsername,
+      artifactPassword,
       revision,
       filesToUpload,
     });

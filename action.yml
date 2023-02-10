@@ -24,7 +24,13 @@ inputs:
     require: false
     default: 'zip'
   artifact-token: 
-    description: 'The artifact host api token'
+    description: 'The artifact host api token. Not needed if username/password is set'
+    required: false
+  artifact-username:
+    description: 'The artifact repo service username. Not needed if token is set'
+    required: false
+  artifact-password:
+    description: 'The artifact repo service password. Not needed if token is set'
     required: false
   main-branch: 
     description: 'The idenfier of which will be the main git repo branch that will be use for production release. Only needed if you wist to have different name of production vs non-production artifact.'
