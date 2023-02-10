@@ -15,7 +15,7 @@ export const createGitRevision = async () => {
   const github = getOctokit(process.env.GITHUB_TOKEN);
   const { repo, owner } = context.repo;
 
-  const gitSHA5 = context.sha.slice(-5);
+  const gitSHA5 = context.sha ? context.sha.slice(-5) : "";
 
   let revision = "";
 
