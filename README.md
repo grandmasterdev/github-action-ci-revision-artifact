@@ -2,6 +2,10 @@
 
 Continuous Integration using **NodeJs** for packaging artifact
 
+## Dependecies
+
+- [github-action-ci-nodejs-package](https://github.com/grandmasterdev/github-action-ci-nodejs-package)
+
 ## What this does?
 
 It creates a git release and publish the build artifact to selected artifact repo.
