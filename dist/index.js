@@ -4434,8 +4434,8 @@ var require_dist_node2 = __commonJS({
     function isKeyOperator(operator) {
       return operator === ";" || operator === "&" || operator === "?";
     }
-    function getValues(context3, operator, key, modifier) {
-      var value = context3[key],
+    function getValues(context4, operator, key, modifier) {
+      var value = context4[key],
         result = [];
       if (isDefined(value) && value !== "") {
         if (
@@ -4508,7 +4508,7 @@ var require_dist_node2 = __commonJS({
         expand: expand.bind(null, template),
       };
     }
-    function expand(template, context3) {
+    function expand(template, context4) {
       var operators = ["+", "#", ".", "/", ";", "?", "&"];
       return template.replace(
         /\{([^\{\}]+)\}|([^\{\}]+)/g,
@@ -4523,7 +4523,7 @@ var require_dist_node2 = __commonJS({
             expression.split(/,/g).forEach(function (variable) {
               var tmp = /([^:\*]*)(?::(\d+)|(\*))?/.exec(variable);
               values.push(
-                getValues(context3, operator, tmp[1], tmp[2] || tmp[3])
+                getValues(context4, operator, tmp[1], tmp[2] || tmp[3])
               );
             });
             if (operator && operator !== "+") {
@@ -19605,7 +19605,9 @@ var createGitRevision = () =>
     }
     const github = (0, import_github.getOctokit)(process.env.GITHUB_TOKEN);
     const { repo, owner } = import_github.context.repo;
-    const gitSHA5 = import_github.context.sha.slice(-5);
+    const gitSHA5 = import_github.context.sha
+      ? import_github.context.sha.slice(-5)
+      : "";
     let revision = "";
     if (versionType !== VersionType.datehash) {
       throw new Error(
@@ -19643,6 +19645,7 @@ var VersionType = /* @__PURE__ */ ((VersionType2) => {
 // src/artifact/index.ts
 var import_core2 = __toESM(require_core());
 var import_exec3 = __toESM(require_exec());
+var import_github3 = __toESM(require_github());
 
 // src/artifact/artifactory.ts
 var import_exec2 = __toESM(require_exec());
@@ -19835,10 +19838,15 @@ var uploadArtifact = (repoName, revision) =>
       packageExtension = packagerType;
     }
     let buildArtifactName = `${repoName}-${revision}`;
-    if (!mainBranch) {
-      buildArtifactName = `${repoName}-${revision}${
-        artifactPostfix ? "-" + artifactPostfix : ""
-      }`;
+    const gitRef = import_github3.context.ref;
+    const gitRefParts = gitRef.split("/");
+    const branch = gitRefParts[gitRefParts.length - 1];
+    console.log("mainBranch", mainBranch);
+    console.log("branch", branch);
+    if (mainBranch && mainBranch === branch) {
+      buildArtifactName = artifactPostfix
+        ? `${repoName}-${revision}"-"${artifactPostfix}`
+        : `${repoName}-${revision}`;
     }
     const buildArtifactFilename = `${buildArtifactName}.${packageExtension}`;
     yield (0,

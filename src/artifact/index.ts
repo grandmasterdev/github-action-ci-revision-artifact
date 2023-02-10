@@ -55,10 +55,13 @@ export const uploadArtifact = async (repoName: string, revision: string) => {
   const gitRefParts = gitRef.split("/");
   const branch = gitRefParts[gitRefParts.length - 1];
 
+  console.log("mainBranch", mainBranch);
+  console.log("branch", branch);
+
   if (mainBranch && mainBranch === branch) {
-    buildArtifactName = `${repoName}-${revision}${
-      artifactPostfix ? "-" + artifactPostfix : ""
-    }`;
+    buildArtifactName = artifactPostfix
+      ? `${repoName}-${revision}"-"${artifactPostfix}`
+      : `${repoName}-${revision}`;
   }
 
   const buildArtifactFilename = `${buildArtifactName}.${packageExtension}`;
