@@ -19605,14 +19605,19 @@ var createGitRevision = () =>
     }
     const github = (0, import_github.getOctokit)(process.env.GITHUB_TOKEN);
     const { repo, owner } = import_github.context.repo;
+    const gitSHA5 = import_github.context.sha.slice(-5);
     let revision = "";
     if (versionType !== VersionType.datehash) {
+      throw new Error(
+        `[createGitRevision] only supporting 'datehash' versioning at the moment. sorry.`
+      );
     } else {
       revision = new Date()
         .toISOString()
         .replace(/-/g, "")
         .replace(/:/g, "")
         .replace(/\./g, "");
+      revision = revision + gitSHA5;
     }
     const releaseMessage = (yield (0, import_exec.getExecOutput)(
       `git log -n 1 --pretty=format:%B`

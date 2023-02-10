@@ -15,18 +15,25 @@ export const createGitRevision = async () => {
   const github = getOctokit(process.env.GITHUB_TOKEN);
   const { repo, owner } = context.repo;
 
+  const gitSHA5 = context.sha.slice(-5);
+
   let revision = "";
 
   if (versionType !== VersionType.datehash) {
     /**
      * Only supporting nodejs based applications at the moment
      */
+    throw new Error(
+      `[createGitRevision] only supporting 'datehash' versioning at the moment. sorry.`
+    );
   } else {
     revision = new Date()
       .toISOString()
       .replace(/-/g, "")
       .replace(/:/g, "")
       .replace(/\./g, "");
+
+    revision = revision + gitSHA5;
   }
 
   const releaseMessage = (
