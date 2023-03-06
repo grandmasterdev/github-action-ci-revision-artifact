@@ -41,6 +41,10 @@ inputs:
   extra-artifact-files:
     description: 'The files that will be uploaded as artifacts other than "build.<extension>". Multiple artifacts must be "," seperated (eg. "asset.tar, script.sh"). Default would be "build.<ext>" if no value is provided.'
     required: false
+  create-revision:
+    description: 'Determine if the revision should be created or not by the action'
+    required: false
+    default: 'true'
 
 outputs:
   is_updated:

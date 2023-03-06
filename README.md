@@ -85,6 +85,7 @@ or if you are using `context`
 | artifact-postfix     | The postfix that will be use for non-production artifact if "main-branch" is configured. If no value is set here it will default to standard naming.                                                        | :x:                |
 | packager-type        | Define if it is a "zip" or "tar" package. If no value provided it will be defaulted to "zip"                                                                                                                | :x:                |
 | extra-artifact-files | The files that will be uploaded as artifacts other than "build.<extension>". Multiple artifacts must be "," seperated (eg. "asset.tar, script.sh"). Default would be "build.<ext>" if no value is provided. | :x:                |
+| extra-artifact-files |Determine if the revision should be created or not by the action. Default to `true` | :x:                |
 
 ## Outputs
 

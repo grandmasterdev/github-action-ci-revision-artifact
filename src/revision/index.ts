@@ -7,6 +7,11 @@ const versionType = getInput("version-type", {
   trimWhitespace: true,
 });
 
+const createRevision = getInput("create-revision", {
+  required: false,
+  trimWhitespace: true
+});
+
 export const createGitRevision = async () => {
   if (!process.env.GITHUB_TOKEN) {
     throw new Error(`[createGitRevision] no github token found in the env!`);
@@ -40,13 +45,15 @@ export const createGitRevision = async () => {
     await getExecOutput(`git log -n 1 --pretty=format:%B`)
   ).stdout;
 
-  github.rest.repos.createRelease({
-    owner,
-    repo,
-    tag_name: revision,
-    generate_release_notes: true,
-    name: releaseMessage,
-  });
+  if(createRevision === 'true') {
+    github.rest.repos.createRelease({
+      owner,
+      repo,
+      tag_name: revision,
+      generate_release_notes: true,
+      name: releaseMessage,
+    });
+  }
 
   return {
     repo,
