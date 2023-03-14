@@ -9,7 +9,7 @@ const versionType = getInput("version-type", {
 
 const createRevision = getInput("create-revision", {
   required: false,
-  trimWhitespace: true
+  trimWhitespace: true,
 });
 
 export const createGitRevision = async () => {
@@ -45,7 +45,7 @@ export const createGitRevision = async () => {
     await getExecOutput(`git log -n 1 --pretty=format:%B`)
   ).stdout;
 
-  if(createRevision === 'true') {
+  if (createRevision === "true") {
     github.rest.repos.createRelease({
       owner,
       repo,
