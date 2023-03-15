@@ -19851,9 +19851,10 @@ var uploadArtifact = (repoName, revision) =>
     console.log("branch", branch);
     if (mainBranch && mainBranch !== branch) {
       console.log("NOT MAIN BRANCH");
-      buildArtifactName = artifactPostfix
-        ? `${repoName}-${revision}"-"${artifactPostfix}`
-        : `${repoName}-${revision}`;
+      revision = artifactPostfix
+        ? `${revision}"-"${artifactPostfix}`
+        : `${revision}`;
+      buildArtifactName = `${repoName}-${revision}`;
     }
     const buildArtifactFilename = `${buildArtifactName}.${packageExtension}`;
     yield (0,
