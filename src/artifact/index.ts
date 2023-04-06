@@ -70,9 +70,10 @@ export const uploadArtifact = async (repoName: string, revision: string) => {
 
   const buildArtifactFilename = `${buildArtifactName}.${packageExtension}`;
 
-  await exec(`cp ./build.${packageExtension} ./${buildArtifactFilename}`);
+  await exec(`zip ./${buildArtifactFilename} ./build.${packageExtension}`);
+  await exec(`echo "VERSION=${revision}" > version.conf`);
 
-  let filesToUpload = [`${buildArtifactFilename}`];
+  let filesToUpload = [`${buildArtifactFilename}`, "version.conf"];
 
   if (extraArtifactFiles) {
     let extraArtifactFilesArray = extraArtifactFiles.split(",");

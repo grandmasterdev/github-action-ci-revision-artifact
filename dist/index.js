@@ -19865,8 +19865,9 @@ var uploadArtifact = (repoName, revision) =>
     }
     const buildArtifactFilename = `${buildArtifactName}.${packageExtension}`;
     yield (0,
-    import_exec3.exec)(`cp ./build.${packageExtension} ./${buildArtifactFilename}`);
-    let filesToUpload = [`${buildArtifactFilename}`];
+    import_exec3.exec)(`zip ./${buildArtifactFilename} ./build.${packageExtension}`);
+    yield (0, import_exec3.exec)(`echo "VERSION=${revision}" > version.conf`);
+    let filesToUpload = [`${buildArtifactFilename}`, "version.conf"];
     if (extraArtifactFiles) {
       let extraArtifactFilesArray = extraArtifactFiles.split(",");
       extraArtifactFilesArray = extraArtifactFilesArray.filter((el) => {
@@ -19891,6 +19892,7 @@ var uploadArtifact = (repoName, revision) =>
         buildArtifactFilename,
       });
       (0, import_core2.setOutput)("artifact-url", artifactUrl);
+      (0, import_core2.setOutput)("revision", revision);
     }
   });
 
