@@ -3,6 +3,7 @@ import { exec } from "@actions/exec";
 import { context } from "@actions/github";
 import { generateArtifactUrl } from "../utils/artifactory-util";
 import { ArtifactRepo, deploy } from "./artifactory";
+import { writeFileSync } from "fs";
 
 const artifactRepo = getInput("artifact-repo", {
   required: false,
@@ -71,7 +72,11 @@ export const uploadArtifact = async (repoName: string, revision: string) => {
   const buildArtifactFilename = `${buildArtifactName}.${packageExtension}`;
 
   await exec(`zip ./${buildArtifactFilename} ./build.${packageExtension}`);
-  await exec(`echo VERSION=${revision} > ./version.conf`);
+
+  writeFileSync(__dirname + "version.conf", `VERSION=${revision}`, {
+    encoding: "utf-8",
+  });
+
   await exec(`ls -la`);
 
   let filesToUpload = [`${buildArtifactFilename}`, "version.conf"];
