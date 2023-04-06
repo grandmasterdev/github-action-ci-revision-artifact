@@ -19870,12 +19870,10 @@ var uploadArtifact = (repoName, revision) =>
     import_exec3.exec)(`zip ./${buildArtifactFilename} ./build.${packageExtension}`);
     const pwdOut = yield (0, import_exec4.getExecOutput)("pwd");
     const workingDir = pwdOut.stdout.replace(/\n/g, "");
-    console.log("working-dir", workingDir);
     (0,
     import_fs2.writeFileSync)(workingDir + "/version.conf", `VERSION=${revision}`, {
       encoding: "utf-8",
     });
-    yield (0, import_exec3.exec)(`ls -la`);
     let filesToUpload = [`${buildArtifactFilename}`, "version.conf"];
     if (extraArtifactFiles) {
       let extraArtifactFilesArray = extraArtifactFiles.split(",");
