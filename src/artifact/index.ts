@@ -1,6 +1,7 @@
-import { getInput } from "@actions/core";
+import { getInput, setOutput } from "@actions/core";
 import { exec } from "@actions/exec";
 import { context } from "@actions/github";
+import { generateArtifactUrl } from "../utils/artifactory-util";
 import { ArtifactRepo, deploy } from "./artifactory";
 
 const artifactRepo = getInput("artifact-repo", {
@@ -93,5 +94,15 @@ export const uploadArtifact = async (repoName: string, revision: string) => {
       revision,
       filesToUpload,
     });
+
+    const artifactUrl = generateArtifactUrl({
+      artifactHost,
+      artifactPath,
+      revision,
+      buildArtifactFilename,
+    });
+
+    setOutput("artifact-url", artifactUrl);
+    setOutput("revision", revision);
   }
 };

@@ -2509,7 +2509,7 @@ var require_core = __commonJS({
 Support boolean input list: \`true | True | TRUE | false | False | FALSE\``);
     }
     exports.getBooleanInput = getBooleanInput;
-    function setOutput(name, value) {
+    function setOutput2(name, value) {
       const filePath = process.env["GITHUB_OUTPUT"] || "";
       if (filePath) {
         return file_command_1.issueFileCommand(
@@ -2524,7 +2524,7 @@ Support boolean input list: \`true | True | TRUE | false | False | FALSE\``);
         utils_1.toCommandValue(value)
       );
     }
-    exports.setOutput = setOutput;
+    exports.setOutput = setOutput2;
     function setCommandEcho(enabled) {
       command_1.issue("echo", enabled ? "on" : "off");
     }
@@ -19653,10 +19653,6 @@ var import_core2 = __toESM(require_core());
 var import_exec3 = __toESM(require_exec());
 var import_github3 = __toESM(require_github());
 
-// src/artifact/artifactory.ts
-var import_exec2 = __toESM(require_exec());
-var import_github2 = __toESM(require_github());
-
 // src/utils/artifactory-util.ts
 var generateBuildInfoModuleId = (repoPath, branch) => {
   if (!repoPath) {
@@ -19684,8 +19680,19 @@ var generateCurlCredential = (props) => {
     `[generateCurlCredential] no required props is/are available!`
   );
 };
+var generateArtifactUrl = (props) => {
+  const {
+    artifactHost: artifactHost2,
+    artifactPath: artifactPath2,
+    revision,
+    buildArtifactFilename,
+  } = props;
+  return `${artifactHost2}/${artifactPath2}/${revision}/${buildArtifactFilename}`;
+};
 
 // src/artifact/artifactory.ts
+var import_exec2 = __toESM(require_exec());
+var import_github2 = __toESM(require_github());
 var import_fs = require("fs");
 var import_path = require("path");
 var deploy = (props) =>
@@ -19877,6 +19884,13 @@ var uploadArtifact = (repoName, revision) =>
         revision,
         filesToUpload,
       });
+      const artifactUrl = generateArtifactUrl({
+        artifactHost,
+        artifactPath,
+        revision,
+        buildArtifactFilename,
+      });
+      (0, import_core2.setOutput)("artifact-url", artifactUrl);
     }
   });
 

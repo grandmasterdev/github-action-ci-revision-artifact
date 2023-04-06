@@ -39,8 +39,26 @@ export const generateCurlCredential = (props: CurlCredentialProps) => {
   );
 };
 
+/**
+ *
+ * @param props
+ * @returns artifact url
+ */
+export const generateArtifactUrl = (props: GenerateArtifactUrl) => {
+  const { artifactHost, artifactPath, revision, buildArtifactFilename } = props;
+
+  return `${artifactHost}/${artifactPath}/${revision}/${buildArtifactFilename}`;
+};
+
 export interface CurlCredentialProps {
   artifactToken?: string;
   artifactUsername?: string;
   artifactPassword?: string;
+}
+
+export interface GenerateArtifactUrl {
+  artifactHost: string;
+  artifactPath: string;
+  revision: string;
+  buildArtifactFilename: string;
 }

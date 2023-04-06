@@ -47,8 +47,10 @@ inputs:
     default: 'true'
 
 outputs:
-  is_updated:
-    description: 'informs if the update was done successfully or not'
+  artifact-url:
+    description: 'The path where the packaged artifact was uploaded'
+  revision:
+    description: 'The revision number/label of the build'
 
 runs:
   using: node16

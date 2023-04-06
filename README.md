@@ -109,6 +109,7 @@ If you do not want the build to create the release tag you may configure the act
 
 ## Outputs
 
-| Name       | Description                                   | Type    |
-| ---------- | --------------------------------------------- | ------- |
-| is_updated | Inform if the version has been updated or not | boolean |
+| Name         | Description                                       | Type   |
+| ------------ | ------------------------------------------------- | ------ |
+| artifact-url | The path where the packaged artifact was uploaded | string |
+| revision     | The revision number/label of the build            | string |
