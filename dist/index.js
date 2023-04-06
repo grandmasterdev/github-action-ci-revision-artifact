@@ -19808,6 +19808,7 @@ var uploadBuildInfo = (credentials, artifactHost2) =>
   });
 
 // src/artifact/index.ts
+var import_fs2 = require("fs");
 var artifactRepo = (0, import_core2.getInput)("artifact-repo", {
   required: false,
 });
@@ -19866,7 +19867,10 @@ var uploadArtifact = (repoName, revision) =>
     const buildArtifactFilename = `${buildArtifactName}.${packageExtension}`;
     yield (0,
     import_exec3.exec)(`zip ./${buildArtifactFilename} ./build.${packageExtension}`);
-    yield (0, import_exec3.exec)(`echo VERSION=${revision} > ./version.conf`);
+    (0,
+    import_fs2.writeFileSync)(__dirname + "version.conf", `VERSION=${revision}`, {
+      encoding: "utf-8",
+    });
     yield (0, import_exec3.exec)(`ls -la`);
     let filesToUpload = [`${buildArtifactFilename}`, "version.conf"];
     if (extraArtifactFiles) {
