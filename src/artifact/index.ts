@@ -72,8 +72,6 @@ export const uploadArtifact = async (repoName: string, revision: string) => {
 
   const buildArtifactFilename = `${buildArtifactName}.${packageExtension}`;
 
-  await exec(`zip ./${buildArtifactFilename} ./build.${packageExtension}`);
-
   const pwdOut = await getExecOutput("pwd");
   const workingDir = pwdOut.stdout.replace(/\n/g, "");
 
@@ -81,7 +79,10 @@ export const uploadArtifact = async (repoName: string, revision: string) => {
     encoding: "utf-8",
   });
 
-  let filesToUpload = [`${buildArtifactFilename}`, "version.conf"];
+  await exec(`zip -ur ./build.${packageExtension} version.conf`);
+  await exec(`zip ./${buildArtifactFilename} ./build.${packageExtension}`);
+
+  let filesToUpload = [`${buildArtifactFilename}`];
 
   if (extraArtifactFiles) {
     let extraArtifactFilesArray = extraArtifactFiles.split(",");
