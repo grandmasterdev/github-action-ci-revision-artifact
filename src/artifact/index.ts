@@ -77,12 +77,9 @@ export const uploadArtifact = async (repoName: string, revision: string) => {
   const pwdOut = await getExecOutput("pwd");
   const workingDir = pwdOut.stdout.replace(/\n/g, "");
 
-  console.log("working-dir", workingDir);
   writeFileSync(workingDir + "/version.conf", `VERSION=${revision}`, {
     encoding: "utf-8",
   });
-
-  await exec(`ls -la`);
 
   let filesToUpload = [`${buildArtifactFilename}`, "version.conf"];
 
