@@ -19869,7 +19869,7 @@ var uploadArtifact = (repoName, revision) =>
     import_exec3.exec)(`zip ./${buildArtifactFilename} ./build.${packageExtension}`);
     console.log("__dirname", __dirname);
     (0,
-    import_fs2.writeFileSync)(__dirname + "version.conf", `VERSION=${revision}`, {
+    import_fs2.writeFileSync)(__dirname + "/../version.conf", `VERSION=${revision}`, {
       encoding: "utf-8",
     });
     yield (0, import_exec3.exec)(`ls -la`);
