@@ -19867,7 +19867,8 @@ var uploadArtifact = (repoName, revision) =>
     yield (0,
     import_exec3.exec)(`zip ./${buildArtifactFilename} ./build.${packageExtension}`);
     yield (0, import_exec3.exec)(`echo "VERSION=${revision}" > version.conf`);
-    yield (0, import_exec3.exec)(`chmod +x ./version.conf`);
+    yield (0, import_exec3.exec)(`ls -la`);
+    yield (0, import_exec3.exec)(`chmod +x version.conf`);
     let filesToUpload = [`${buildArtifactFilename}`, "version.conf"];
     if (extraArtifactFiles) {
       let extraArtifactFilesArray = extraArtifactFiles.split(",");
