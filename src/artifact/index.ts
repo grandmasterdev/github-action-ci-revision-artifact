@@ -74,7 +74,7 @@ export const uploadArtifact = async (repoName: string, revision: string) => {
 
   await exec(`zip ./${buildArtifactFilename} ./build.${packageExtension}`);
 
-  const workingDir = await getExecOutput("pwd");
+  const workingDir = (await getExecOutput("pwd")).stdout.replace(/\n/g, "");
 
   console.log("working-dir", workingDir);
   writeFileSync(workingDir + "/version.conf", `VERSION=${revision}`, {
