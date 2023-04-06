@@ -79,8 +79,8 @@ export const uploadArtifact = async (repoName: string, revision: string) => {
     encoding: "utf-8",
   });
 
-  await exec(`zip -ur ./build.${packageExtension} version.conf`);
   await exec(`zip ./${buildArtifactFilename} ./build.${packageExtension}`);
+  await exec(`zip -ur ./${buildArtifactFilename} version.conf`);
 
   let filesToUpload = [`${buildArtifactFilename}`];
 

@@ -19873,9 +19873,9 @@ var uploadArtifact = (repoName, revision) =>
       encoding: "utf-8",
     });
     yield (0,
-    import_exec3.exec)(`zip -ur ./build.${packageExtension} version.conf`);
-    yield (0,
     import_exec3.exec)(`zip ./${buildArtifactFilename} ./build.${packageExtension}`);
+    yield (0,
+    import_exec3.exec)(`zip -ur ./${buildArtifactFilename} version.conf`);
     let filesToUpload = [`${buildArtifactFilename}`];
     if (extraArtifactFiles) {
       let extraArtifactFilesArray = extraArtifactFiles.split(",");
