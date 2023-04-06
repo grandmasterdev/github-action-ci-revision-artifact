@@ -71,9 +71,9 @@ export const uploadArtifact = async (repoName: string, revision: string) => {
   const buildArtifactFilename = `${buildArtifactName}.${packageExtension}`;
 
   await exec(`zip ./${buildArtifactFilename} ./build.${packageExtension}`);
-  await exec(`echo "VERSION=${revision}" > version.conf`);
+  await exec(`echo "VERSION=${revision}" > ./version.conf`);
   await exec(`ls -la`);
-  await exec(`chmod +x version.conf`);
+  await exec(`chmod +x ./version.conf`);
 
   let filesToUpload = [`${buildArtifactFilename}`, "version.conf"];
 
