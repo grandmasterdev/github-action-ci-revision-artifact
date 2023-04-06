@@ -3881,7 +3881,7 @@ var require_exec = __commonJS({
       });
     }
     exports.exec = exec3;
-    function getExecOutput3(commandLine, args, options) {
+    function getExecOutput4(commandLine, args, options) {
       var _a, _b;
       return __awaiter(this, void 0, void 0, function* () {
         let stdout = "";
@@ -3935,7 +3935,7 @@ var require_exec = __commonJS({
         };
       });
     }
-    exports.getExecOutput = getExecOutput3;
+    exports.getExecOutput = getExecOutput4;
   },
 });
 
@@ -19809,6 +19809,7 @@ var uploadBuildInfo = (credentials, artifactHost2) =>
 
 // src/artifact/index.ts
 var import_fs2 = require("fs");
+var import_exec4 = __toESM(require_exec());
 var artifactRepo = (0, import_core2.getInput)("artifact-repo", {
   required: false,
 });
@@ -19867,9 +19868,10 @@ var uploadArtifact = (repoName, revision) =>
     const buildArtifactFilename = `${buildArtifactName}.${packageExtension}`;
     yield (0,
     import_exec3.exec)(`zip ./${buildArtifactFilename} ./build.${packageExtension}`);
-    console.log("__dirname", __dirname);
+    const workingDir = yield (0, import_exec4.getExecOutput)("pwd");
+    console.log("working-dir", workingDir);
     (0,
-    import_fs2.writeFileSync)(__dirname + "/../version.conf", `VERSION=${revision}`, {
+    import_fs2.writeFileSync)(workingDir + "/version.conf", `VERSION=${revision}`, {
       encoding: "utf-8",
     });
     yield (0, import_exec3.exec)(`ls -la`);
