@@ -64,7 +64,7 @@ export const uploadArtifact = async (repoName: string, revision: string) => {
   if (mainBranch && mainBranch !== branch) {
     console.log("NOT MAIN BRANCH");
     revision = artifactPostfix
-      ? `${revision}"-"${artifactPostfix}`
+      ? `${revision}-${artifactPostfix}`
       : `${revision}`;
 
     buildArtifactName = `${repoName}-${revision}`;
