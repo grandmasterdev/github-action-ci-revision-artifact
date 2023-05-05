@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "test": "jest --collectCoverage",
-    "build": "esbuild src/index.ts --bundle --platform=node --outfile=dist/index.js",
+    "build": "esbuild src/index.ts --bundle --platform=node --outdir=dist",
     "lint": "eslint --fix",
     "prettier:format": "prettier --write src/**/*.ts"
   },
