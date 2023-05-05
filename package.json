@@ -10,7 +10,7 @@
     "prettier:format": "prettier --write src/**/*.ts"
   },
   "lint-staged": {
-    "*.{ts}": [
+    "*.ts": [
       "npm run build"
     ],
     "*.{ts,js}": [
