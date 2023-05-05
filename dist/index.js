@@ -19602,6 +19602,13 @@ var createRevision = (0, import_core.getInput)("create-revision", {
   required: false,
   trimWhitespace: true,
 });
+var revisionDatehashWithMilliseconds = (0, import_core.getInput)(
+  "revision-datehash-with-milliseconds",
+  {
+    required: false,
+    trimWhitespace: true,
+  }
+);
 var createGitRevision = () =>
   __async(void 0, null, function* () {
     if (!process.env.GITHUB_TOKEN) {
@@ -19610,7 +19617,7 @@ var createGitRevision = () =>
     const github = (0, import_github.getOctokit)(process.env.GITHUB_TOKEN);
     const { repo, owner } = import_github.context.repo;
     const gitSHA5 = import_github.context.sha
-      ? import_github.context.sha.slice(-5)
+      ? import_github.context.sha.slice(-7)
       : "";
     let revision = "";
     if (versionType !== VersionType.datehash) {
@@ -19622,7 +19629,15 @@ var createGitRevision = () =>
         .toISOString()
         .replace(/-/g, "")
         .replace(/:/g, "")
-        .replace(/\./g, "");
+        .replace(/\./g, "")
+        .replace(/Z/g, "H");
+      if (revisionDatehashWithMilliseconds !== "true") {
+        const millisecondsValue = revision.substring(
+          revision.indexOf("T") + 7,
+          revision.indexOf("H")
+        );
+        revision = revision.replace(millisecondsValue, "");
+      }
       revision = revision + gitSHA5;
     }
     const releaseMessage = (yield (0, import_exec.getExecOutput)(
