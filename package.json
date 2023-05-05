@@ -1,6 +1,6 @@
 {
   "name": "ci-revision-artifact",
-  "version": "1.0.0",
+  "version": "1.0.12",
   "description": "Update git with revision and upload packaged build to artifact repo",
   "main": "dist/index.js",
   "scripts": {
