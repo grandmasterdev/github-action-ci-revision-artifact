@@ -11,15 +11,15 @@
   },
   "lint-staged": {
     "*.{ts,js}": [
-      "npm run lint"
+      "npm run lint",
+      "npm run build"
     ],
     "*.{json,md,html,ts,js}": [
       "npm run prettier:format"
     ]
   },
   "prepare": [
-    "npx husky install",
-    "npm run build"
+    "npx husky install"
   ],
   "keywords": [
     "nodejs",
