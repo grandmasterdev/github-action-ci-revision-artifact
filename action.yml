@@ -45,6 +45,10 @@ inputs:
     description: 'Determine if the revision should be created or not by the action'
     required: false
     default: 'true'
+  revision-datehash-with-milliseconds:
+    description: 'Determine if the datehash revision should include milliseconds or not'
+    required: false
+    default: 'true'
 
 outputs:
   artifact-url:

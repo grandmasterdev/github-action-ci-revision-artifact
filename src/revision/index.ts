@@ -12,6 +12,14 @@ const createRevision = getInput("create-revision", {
   trimWhitespace: true,
 });
 
+const revisionDatehashWithMilliseconds = getInput(
+  "revision-datehash-with-milliseconds",
+  {
+    required: false,
+    trimWhitespace: true,
+  }
+);
+
 export const createGitRevision = async () => {
   if (!process.env.GITHUB_TOKEN) {
     throw new Error(`[createGitRevision] no github token found in the env!`);
@@ -20,7 +28,7 @@ export const createGitRevision = async () => {
   const github = getOctokit(process.env.GITHUB_TOKEN);
   const { repo, owner } = context.repo;
 
-  const gitSHA5 = context.sha ? context.sha.slice(-5) : "";
+  const gitSHA5 = context.sha ? context.sha.slice(-7) : "";
 
   let revision = "";
 
@@ -36,7 +44,17 @@ export const createGitRevision = async () => {
       .toISOString()
       .replace(/-/g, "")
       .replace(/:/g, "")
-      .replace(/\./g, "");
+      .replace(/\./g, "")
+      .replace(/Z/g, "H");
+
+    if (revisionDatehashWithMilliseconds !== "true") {
+      const millisecondsValue = revision.substring(
+        revision.indexOf("T") + 7,
+        revision.indexOf("H")
+      );
+
+      revision = revision.replace(millisecondsValue, "");
+    }
 
     revision = revision + gitSHA5;
   }
