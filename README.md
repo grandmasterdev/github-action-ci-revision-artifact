@@ -1,6 +1,6 @@
-# ci-nodejs-package
+# github-action-ci-revision-artifact
 
-Continuous Integration using **NodeJs** for packaging artifact
+Update git with revision and upload packaged build to artifact repo
 
 ## Dependecies
 
