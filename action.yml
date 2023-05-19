@@ -32,6 +32,10 @@ inputs:
   artifact-password:
     description: 'The artifact repo service password. Not needed if token is set'
     required: false
+  push-source:
+    description: 'Include the source codes into the artifact'
+    required: false
+    default: 'false'
   main-branch: 
     description: 'The idenfier of which will be the main git repo branch that will be use for production release. Only needed if you wist to have different name of production vs non-production artifact.'
     required: false

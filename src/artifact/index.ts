@@ -24,6 +24,9 @@ const artifactHost = getInput("artifact-host", {
 const artifactPath = getInput("artifact-path", {
   required: true,
 });
+const pushSource = getInput("push-source", {
+  required: false,
+});
 const mainBranch = getInput("main-branch", {
   required: false,
 });
@@ -37,6 +40,11 @@ const extraArtifactFiles = getInput("extra-artifact-files", {
   required: false,
 });
 
+/**
+ *
+ * @param repoName
+ * @param revision
+ */
 export const uploadArtifact = async (repoName: string, revision: string) => {
   if (!revision) {
     throw new Error(`[uploadArtifact] missing revision!`);
@@ -79,10 +87,20 @@ export const uploadArtifact = async (repoName: string, revision: string) => {
     encoding: "utf-8",
   });
 
-  await exec(`zip ./${buildArtifactFilename} ./build.${packageExtension}`);
-  await exec(`zip -ur ./${buildArtifactFilename} version.conf`);
-
   let filesToUpload = [`${buildArtifactFilename}`];
+
+  if (packageExtension && packageExtension === "zip") {
+    if (pushSource && pushSource === "true") {
+      const buildSource = `./${buildArtifactName}-src.${packageExtension}`;
+
+      await exec(`zip ./${buildSource}-src ./`);
+
+      filesToUpload = filesToUpload.concat(buildSource);
+    }
+
+    await exec(`zip ./${buildArtifactFilename} ./build.${packageExtension}`);
+    await exec(`zip -ur ./${buildArtifactFilename} version.conf`);
+  }
 
   if (extraArtifactFiles) {
     let extraArtifactFilesArray = extraArtifactFiles.split(",");

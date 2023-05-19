@@ -19843,6 +19843,9 @@ var artifactHost = (0, import_core2.getInput)("artifact-host", {
 var artifactPath = (0, import_core2.getInput)("artifact-path", {
   required: true,
 });
+var pushSource = (0, import_core2.getInput)("push-source", {
+  required: false,
+});
 var mainBranch = (0, import_core2.getInput)("main-branch", {
   required: false,
 });
@@ -19887,11 +19890,20 @@ var uploadArtifact = (repoName, revision) =>
     import_fs2.writeFileSync)(workingDir + "/version.conf", `VERSION=${revision}`, {
       encoding: "utf-8",
     });
-    yield (0,
-    import_exec3.exec)(`zip ./${buildArtifactFilename} ./build.${packageExtension}`);
-    yield (0,
-    import_exec3.exec)(`zip -ur ./${buildArtifactFilename} version.conf`);
     let filesToUpload = [`${buildArtifactFilename}`];
+    if (packageExtension && packageExtension === "zip") {
+      if (pushSource && pushSource === "true") {
+        const buildSource = `./${buildArtifactName}-src.${packageExtension}`;
+        yield (0, import_exec3.exec)(`zip ./${buildSource}-src ./`);
+        filesToUpload = filesToUpload.concat(buildSource);
+      }
+      yield (0, import_exec3.exec)(
+        `zip ./${buildArtifactFilename} ./build.${packageExtension}`
+      );
+      yield (0, import_exec3.exec)(
+        `zip -ur ./${buildArtifactFilename} version.conf`
+      );
+    }
     if (extraArtifactFiles) {
       let extraArtifactFilesArray = extraArtifactFiles.split(",");
       extraArtifactFilesArray = extraArtifactFilesArray.filter((el) => {
