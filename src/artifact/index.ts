@@ -90,13 +90,11 @@ export const uploadArtifact = async (repoName: string, revision: string) => {
   let filesToUpload = [`${buildArtifactFilename}`];
 
   if (packageExtension && packageExtension === "zip") {
-    if (pushSource && pushSource === "true") {
-      const buildSource = `./${buildArtifactName}-src.${packageExtension}`;
-
-      await exec(`zip ./${buildSource}-src ./`);
-
-      filesToUpload = filesToUpload.concat(buildSource);
-    }
+    filesToUpload = await pushSourceToRepo(pushSource, {
+      buildArtifactName,
+      packageExtension,
+      filesToUpload,
+    });
 
     await exec(`zip ./${buildArtifactFilename} ./build.${packageExtension}`);
     await exec(`zip -ur ./${buildArtifactFilename} version.conf`);
@@ -134,3 +132,34 @@ export const uploadArtifact = async (repoName: string, revision: string) => {
     setOutput("revision", revision);
   }
 };
+
+/**
+ *
+ * @param isPushSource
+ * @param props
+ * @returns
+ */
+const pushSourceToRepo = async (
+  isPushSource: string,
+  props: PushSourceToRepoProps
+) => {
+  const { buildArtifactName, packageExtension } = props;
+
+  let { filesToUpload } = props;
+
+  if (isPushSource && isPushSource === "true") {
+    const buildSource = `./${buildArtifactName}-src.${packageExtension}`;
+
+    await exec(`zip ./${buildSource}-src ./`);
+
+    filesToUpload = filesToUpload.concat(buildSource);
+  }
+
+  return filesToUpload;
+};
+
+export interface PushSourceToRepoProps {
+  buildArtifactName: string;
+  packageExtension: string;
+  filesToUpload: string[];
+}

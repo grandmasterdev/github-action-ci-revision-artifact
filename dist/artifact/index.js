@@ -2477,7 +2477,7 @@ var require_core = __commonJS({
       ] = `${inputPath}${path.delimiter}${process.env["PATH"]}`;
     }
     exports.addPath = addPath;
-    function getInput3(name, options) {
+    function getInput2(name, options) {
       const val =
         process.env[`INPUT_${name.replace(/ /g, "_").toUpperCase()}`] || "";
       if (options && options.required && !val) {
@@ -2488,9 +2488,9 @@ var require_core = __commonJS({
       }
       return val.trim();
     }
-    exports.getInput = getInput3;
+    exports.getInput = getInput2;
     function getMultilineInput(name, options) {
-      const inputs = getInput3(name, options)
+      const inputs = getInput2(name, options)
         .split("\n")
         .filter((x) => x !== "");
       if (options && options.trimWhitespace === false) {
@@ -2502,7 +2502,7 @@ var require_core = __commonJS({
     function getBooleanInput(name, options) {
       const trueValue = ["true", "True", "TRUE"];
       const falseValue = ["false", "False", "FALSE"];
-      const val = getInput3(name, options);
+      const val = getInput2(name, options);
       if (trueValue.includes(val)) return true;
       if (falseValue.includes(val)) return false;
       throw new TypeError(`Input does not meet YAML 1.2 "Core Schema" specification: ${name}
@@ -3881,7 +3881,7 @@ var require_exec = __commonJS({
       });
     }
     exports.exec = exec3;
-    function getExecOutput4(commandLine, args, options) {
+    function getExecOutput3(commandLine, args, options) {
       var _a, _b;
       return __awaiter(this, void 0, void 0, function* () {
         let stdout = "";
@@ -3935,7 +3935,7 @@ var require_exec = __commonJS({
         };
       });
     }
-    exports.getExecOutput = getExecOutput4;
+    exports.getExecOutput = getExecOutput3;
   },
 });
 
@@ -4434,8 +4434,8 @@ var require_dist_node2 = __commonJS({
     function isKeyOperator(operator) {
       return operator === ";" || operator === "&" || operator === "?";
     }
-    function getValues(context4, operator, key, modifier) {
-      var value = context4[key],
+    function getValues(context3, operator, key, modifier) {
+      var value = context3[key],
         result = [];
       if (isDefined(value) && value !== "") {
         if (
@@ -4508,7 +4508,7 @@ var require_dist_node2 = __commonJS({
         expand: expand.bind(null, template),
       };
     }
-    function expand(template, context4) {
+    function expand(template, context3) {
       var operators = ["+", "#", ".", "/", ";", "?", "&"];
       return template.replace(
         /\{([^\{\}]+)\}|([^\{\}]+)/g,
@@ -4523,7 +4523,7 @@ var require_dist_node2 = __commonJS({
             expression.split(/,/g).forEach(function (variable) {
               var tmp = /([^:\*]*)(?::(\d+)|(\*))?/.exec(variable);
               values.push(
-                getValues(context4, operator, tmp[1], tmp[2] || tmp[3])
+                getValues(context3, operator, tmp[1], tmp[2] || tmp[3])
               );
             });
             if (operator && operator !== "+") {
@@ -19582,91 +19582,23 @@ var require_github = __commonJS({
     var Context = __importStar(require_context());
     var utils_1 = require_utils4();
     exports.context = new Context.Context();
-    function getOctokit2(token, options, ...additionalPlugins) {
+    function getOctokit(token, options, ...additionalPlugins) {
       const GitHubWithPlugins = utils_1.GitHub.plugin(...additionalPlugins);
       return new GitHubWithPlugins(utils_1.getOctokitOptions(token, options));
     }
-    exports.getOctokit = getOctokit2;
+    exports.getOctokit = getOctokit;
   },
 });
 
-// src/revision/index.ts
-var import_core = __toESM(require_core());
-var import_exec = __toESM(require_exec());
-var import_github = __toESM(require_github());
-var versionType = (0, import_core.getInput)("version-type", {
-  required: true,
-  trimWhitespace: true,
-});
-var createRevision = (0, import_core.getInput)("create-revision", {
-  required: false,
-  trimWhitespace: true,
-});
-var revisionDatehashWithMilliseconds = (0, import_core.getInput)(
-  "revision-datehash-with-milliseconds",
-  {
-    required: false,
-    trimWhitespace: true,
-  }
-);
-var createGitRevision = () =>
-  __async(void 0, null, function* () {
-    if (!process.env.GITHUB_TOKEN) {
-      throw new Error(`[createGitRevision] no github token found in the env!`);
-    }
-    const github = (0, import_github.getOctokit)(process.env.GITHUB_TOKEN);
-    const { repo, owner } = import_github.context.repo;
-    const gitSHA5 = import_github.context.sha
-      ? import_github.context.sha.slice(-7)
-      : "";
-    let revision = "";
-    if (versionType !== VersionType.datehash) {
-      throw new Error(
-        `[createGitRevision] only supporting 'datehash' versioning at the moment. sorry.`
-      );
-    } else {
-      revision = new Date()
-        .toISOString()
-        .replace(/-/g, "")
-        .replace(/:/g, "")
-        .replace(/\./g, "")
-        .replace(/Z/g, "H");
-      if (revisionDatehashWithMilliseconds !== "true") {
-        const millisecondsValue = revision.substring(
-          revision.indexOf("T") + 7,
-          revision.indexOf("H")
-        );
-        revision = revision.replace(millisecondsValue, "");
-      }
-      revision = revision + gitSHA5;
-    }
-    const releaseMessage = (yield (0, import_exec.getExecOutput)(
-      `git log -n 1 --pretty=format:%B`
-    )).stdout;
-    if (createRevision === "true") {
-      github.rest.repos.createRelease({
-        owner,
-        repo,
-        tag_name: revision,
-        generate_release_notes: true,
-        name: releaseMessage,
-      });
-    }
-    return {
-      repo,
-      revision,
-    };
-  });
-var VersionType = /* @__PURE__ */ ((VersionType2) => {
-  VersionType2["semantic"] = "semantic";
-  VersionType2["datehash"] = "datehash";
-  return VersionType2;
-})(VersionType || {});
-
 // src/artifact/index.ts
-var import_core2 = __toESM(require_core());
-var import_exec3 = __toESM(require_exec());
-var import_github3 = __toESM(require_github());
+var artifact_exports = {};
+__export(artifact_exports, {
+  uploadArtifact: () => uploadArtifact,
+});
+module.exports = __toCommonJS(artifact_exports);
+var import_core = __toESM(require_core());
+var import_exec2 = __toESM(require_exec());
+var import_github2 = __toESM(require_github());
 
 // src/utils/artifactory-util.ts
 var generateBuildInfoModuleId = (repoPath, branch) => {
@@ -19706,8 +19638,8 @@ var generateArtifactUrl = (props) => {
 };
 
 // src/artifact/artifactory.ts
-var import_exec2 = __toESM(require_exec());
-var import_github2 = __toESM(require_github());
+var import_exec = __toESM(require_exec());
+var import_github = __toESM(require_github());
 var import_fs = require("fs");
 var import_path = require("path");
 var deploy = (props) =>
@@ -19724,7 +19656,7 @@ var deploy = (props) =>
     } = props;
     const artifactUploadResponses = [];
     for (const i in filesToUpload) {
-      const output = yield (0, import_exec2.getExecOutput)(
+      const output = yield (0, import_exec.getExecOutput)(
         `curl -X PUT -H "Authorization: Bearer ${artifactToken2}" ${artifactHost2}/${artifactPath2}/${revision}/${filesToUpload[i]} -T ${filesToUpload[i]}`
       );
       if (output.stdout) {
@@ -19773,8 +19705,8 @@ var createBuildInfoModuleArtifacts = (props) => {
 };
 var createBuildInfo = (props) =>
   __async(void 0, null, function* () {
-    const buildNumber = import_github2.context.runNumber;
-    const gitRef = import_github2.context.ref;
+    const buildNumber = import_github.context.runNumber;
+    const gitRef = import_github.context.ref;
     const gitRefParts = gitRef.split("/");
     const branch = gitRefParts[gitRefParts.length - 1];
     const {
@@ -19791,7 +19723,7 @@ var createBuildInfo = (props) =>
       number: buildNumber,
       started: startTime.toISOString(),
       durationMillis,
-      url: `${import_github2.context.serverUrl}/${import_github2.context.repo.repo}/actions/runs/${import_github2.context.runId}`,
+      url: `${import_github.context.serverUrl}/${import_github.context.repo.repo}/actions/runs/${import_github.context.runId}`,
       buildAgent: {
         name: "Pipeline",
         version: "",
@@ -19819,43 +19751,43 @@ var uploadBuildInfo = (credentials, artifactHost2) =>
       __spreadValues({}, credentials)
     );
     yield (0,
-    import_exec2.exec)(`curl -X PUT ${credentialStr} ${artifactHost2}/artifactory-build-info -T build-info.json`);
+    import_exec.exec)(`curl -X PUT ${credentialStr} ${artifactHost2}/artifactory-build-info -T build-info.json`);
   });
 
 // src/artifact/index.ts
 var import_fs2 = require("fs");
-var import_exec4 = __toESM(require_exec());
-var artifactRepo = (0, import_core2.getInput)("artifact-repo", {
+var import_exec3 = __toESM(require_exec());
+var artifactRepo = (0, import_core.getInput)("artifact-repo", {
   required: false,
 });
-var artifactToken = (0, import_core2.getInput)("artifact-token", {
+var artifactToken = (0, import_core.getInput)("artifact-token", {
   required: false,
 });
-var artifactUsername = (0, import_core2.getInput)("artifact-username", {
+var artifactUsername = (0, import_core.getInput)("artifact-username", {
   required: false,
 });
-var artifactPassword = (0, import_core2.getInput)("artifact-password", {
+var artifactPassword = (0, import_core.getInput)("artifact-password", {
   required: false,
 });
-var artifactHost = (0, import_core2.getInput)("artifact-host", {
+var artifactHost = (0, import_core.getInput)("artifact-host", {
   required: true,
 });
-var artifactPath = (0, import_core2.getInput)("artifact-path", {
+var artifactPath = (0, import_core.getInput)("artifact-path", {
   required: true,
 });
-var pushSource = (0, import_core2.getInput)("push-source", {
+var pushSource = (0, import_core.getInput)("push-source", {
   required: false,
 });
-var mainBranch = (0, import_core2.getInput)("main-branch", {
+var mainBranch = (0, import_core.getInput)("main-branch", {
   required: false,
 });
-var artifactPostfix = (0, import_core2.getInput)("artifact-postfix", {
+var artifactPostfix = (0, import_core.getInput)("artifact-postfix", {
   required: false,
 });
-var packagerType = (0, import_core2.getInput)("packager-type", {
+var packagerType = (0, import_core.getInput)("packager-type", {
   required: false,
 });
-var extraArtifactFiles = (0, import_core2.getInput)("extra-artifact-files", {
+var extraArtifactFiles = (0, import_core.getInput)("extra-artifact-files", {
   required: false,
 });
 var uploadArtifact = (repoName, revision) =>
@@ -19871,7 +19803,7 @@ var uploadArtifact = (repoName, revision) =>
       packageExtension = packagerType;
     }
     let buildArtifactName = `${repoName}-${revision}`;
-    const gitRef = import_github3.context.ref;
+    const gitRef = import_github2.context.ref;
     const gitRefParts = gitRef.split("/");
     const branch = gitRefParts[gitRefParts.length - 1];
     console.log("mainBranch", mainBranch);
@@ -19884,7 +19816,7 @@ var uploadArtifact = (repoName, revision) =>
       buildArtifactName = `${repoName}-${revision}`;
     }
     const buildArtifactFilename = `${buildArtifactName}.${packageExtension}`;
-    const pwdOut = yield (0, import_exec4.getExecOutput)("pwd");
+    const pwdOut = yield (0, import_exec3.getExecOutput)("pwd");
     const workingDir = pwdOut.stdout.replace(/\n/g, "");
     (0,
     import_fs2.writeFileSync)(workingDir + "/version.conf", `VERSION=${revision}`, {
@@ -19897,10 +19829,10 @@ var uploadArtifact = (repoName, revision) =>
         packageExtension,
         filesToUpload,
       });
-      yield (0, import_exec3.exec)(
+      yield (0, import_exec2.exec)(
         `zip ./${buildArtifactFilename} ./build.${packageExtension}`
       );
-      yield (0, import_exec3.exec)(
+      yield (0, import_exec2.exec)(
         `zip -ur ./${buildArtifactFilename} version.conf`
       );
     }
@@ -19927,8 +19859,8 @@ var uploadArtifact = (repoName, revision) =>
         revision,
         buildArtifactFilename,
       });
-      (0, import_core2.setOutput)("artifact-url", artifactUrl);
-      (0, import_core2.setOutput)("revision", revision);
+      (0, import_core.setOutput)("artifact-url", artifactUrl);
+      (0, import_core.setOutput)("revision", revision);
     }
   });
 var pushSourceToRepo = (isPushSource, props) =>
@@ -19937,21 +19869,16 @@ var pushSourceToRepo = (isPushSource, props) =>
     let { filesToUpload } = props;
     if (isPushSource && isPushSource === "true") {
       const buildSource = `./${buildArtifactName}-src.${packageExtension}`;
-      yield (0, import_exec3.exec)(`zip ./${buildSource}-src ./`);
+      yield (0, import_exec2.exec)(`zip ./${buildSource}-src ./`);
       filesToUpload = filesToUpload.concat(buildSource);
     }
     return filesToUpload;
   });
-
-// src/main.ts
-var run = () =>
-  __async(void 0, null, function* () {
-    const output = yield createGitRevision();
-    yield uploadArtifact(output.repo, output.revision);
+// Annotate the CommonJS export names for ESM import in node:
+0 &&
+  (module.exports = {
+    uploadArtifact,
   });
-
-// src/index.ts
-run();
 /*! Bundled license information:
 
 is-plain-object/dist/is-plain-object.js:
