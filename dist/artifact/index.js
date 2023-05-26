@@ -19869,8 +19869,12 @@ var pushSourceToRepo = (isPushSource, props) =>
     let { filesToUpload } = props;
     if (isPushSource && isPushSource === "true") {
       const buildSource = `./${buildArtifactName}-src`;
-      yield (0, import_exec2.exec)(`zip -r ${buildSource} ./`);
-      filesToUpload = filesToUpload.concat(`buildSource.${packageExtension}`);
+      yield (0, import_exec2.exec)(
+        `zip -r ${buildSource} ./ -x ./node_modules -x ./.git`
+      );
+      filesToUpload = filesToUpload.concat(
+        `${buildSource}.${packageExtension}`
+      );
     }
     return filesToUpload;
   });
