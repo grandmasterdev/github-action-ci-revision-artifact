@@ -148,11 +148,11 @@ const pushSourceToRepo = async (
   let { filesToUpload } = props;
 
   if (isPushSource && isPushSource === "true") {
-    const buildSource = `./${buildArtifactName}-src.${packageExtension}`;
+    const buildSource = `./${buildArtifactName}-src`;
 
     await exec(`zip ./${buildSource}-src ./`);
 
-    filesToUpload = filesToUpload.concat(buildSource);
+    filesToUpload = filesToUpload.concat(`buildSource.${packageExtension}`);
   }
 
   return filesToUpload;

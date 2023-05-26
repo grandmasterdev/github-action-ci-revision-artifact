@@ -19936,9 +19936,9 @@ var pushSourceToRepo = (isPushSource, props) =>
     const { buildArtifactName, packageExtension } = props;
     let { filesToUpload } = props;
     if (isPushSource && isPushSource === "true") {
-      const buildSource = `./${buildArtifactName}-src.${packageExtension}`;
+      const buildSource = `./${buildArtifactName}-src`;
       yield (0, import_exec3.exec)(`zip ./${buildSource}-src ./`);
-      filesToUpload = filesToUpload.concat(buildSource);
+      filesToUpload = filesToUpload.concat(`buildSource.${packageExtension}`);
     }
     return filesToUpload;
   });
