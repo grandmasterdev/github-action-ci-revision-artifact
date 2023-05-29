@@ -6,6 +6,11 @@ import {
 } from "../utils/artifactory-util";
 import { writeFileSync } from "fs";
 import { join } from "path";
+import { getInput } from "@actions/core";
+
+const artifactProperties = getInput("artifact-properties", {
+  required: false,
+});
 
 /**
  * Run deployment of artifact and build-info to jfrog artifactory repo
@@ -26,15 +31,30 @@ export const deploy = async (props: Deploy) => {
 
   const artifactUploadResponses: ArtifactUploadResponseInfo[] = [];
 
+  const credentialStr = generateCurlCredential({
+    artifactPassword,
+    artifactUsername,
+    artifactToken,
+  });
+
   for (const i in filesToUpload) {
+    const artifactUrl = `${artifactHost}/${artifactPath}/${revision}/${filesToUpload[i]}`;
+
     const output = await getExecOutput(
-      `curl -X PUT -H "Authorization: Bearer ${artifactToken}" ${artifactHost}/${artifactPath}/${revision}/${filesToUpload[i]} -T ${filesToUpload[i]}`
+      `curl -X PUT ${credentialStr} ${artifactUrl} -T ${filesToUpload[i]}`
     );
 
     if (output.stdout) {
       artifactUploadResponses.push({
         filename: filesToUpload[i],
         response: JSON.parse(output.stdout),
+      });
+
+      await addPropertiesToArtifact({
+        artifactUsername,
+        artifactPassword,
+        artifactToken,
+        artifactUrl,
       });
     }
   }
@@ -59,6 +79,48 @@ export const deploy = async (props: Deploy) => {
     },
     artifactHost
   );
+};
+
+/**
+ *
+ * @param props
+ */
+const addPropertiesToArtifact = async (props: ArtifactMetadata) => {
+  if (artifactProperties) {
+    const { artifactPassword, artifactUsername, artifactToken, artifactUrl } =
+      props;
+
+    const credentialStr = generateCurlCredential({
+      artifactPassword,
+      artifactUsername,
+      artifactToken,
+    });
+
+    const artifactPropertiesArr = artifactProperties.split(",");
+
+    const properties: Record<string, string> = {};
+
+    artifactPropertiesArr.forEach((propStr) => {
+      const propArr = propStr.split("=");
+
+      if (Array.isArray(propArr) && propArr.length > 1) {
+        properties[propArr[0]] = propArr[1];
+      }
+    });
+
+    const output = await getExecOutput(
+      `curl -X PUT ${credentialStr} ${artifactUrl} -d ${JSON.stringify(
+        properties
+      )}`
+    );
+
+    if (output.stdout) {
+      console.log(
+        `[addPropertiesToArtifact] successfully added properties to artifact.`
+      );
+      console.debug(`[addPropertiesToArtifact] ${JSON.stringify(properties)}`);
+    }
+  }
 };
 
 /**
@@ -240,6 +302,13 @@ export interface ArtifactoryCreateBuildInfoProps {
   artifactPath: string;
   artifacts: ArtifactoryBuildInfoArtifact[];
   startTime: Date;
+}
+
+export interface ArtifactMetadata {
+  artifactUrl: string;
+  artifactToken?: string;
+  artifactUsername?: string;
+  artifactPassword?: string;
 }
 
 export interface CredentialProps {

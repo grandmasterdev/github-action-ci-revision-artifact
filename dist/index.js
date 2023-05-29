@@ -2477,7 +2477,7 @@ var require_core = __commonJS({
       ] = `${inputPath}${path.delimiter}${process.env["PATH"]}`;
     }
     exports.addPath = addPath;
-    function getInput3(name, options) {
+    function getInput4(name, options) {
       const val =
         process.env[`INPUT_${name.replace(/ /g, "_").toUpperCase()}`] || "";
       if (options && options.required && !val) {
@@ -2488,9 +2488,9 @@ var require_core = __commonJS({
       }
       return val.trim();
     }
-    exports.getInput = getInput3;
+    exports.getInput = getInput4;
     function getMultilineInput(name, options) {
-      const inputs = getInput3(name, options)
+      const inputs = getInput4(name, options)
         .split("\n")
         .filter((x) => x !== "");
       if (options && options.trimWhitespace === false) {
@@ -2502,7 +2502,7 @@ var require_core = __commonJS({
     function getBooleanInput(name, options) {
       const trueValue = ["true", "True", "TRUE"];
       const falseValue = ["false", "False", "FALSE"];
-      const val = getInput3(name, options);
+      const val = getInput4(name, options);
       if (trueValue.includes(val)) return true;
       if (falseValue.includes(val)) return false;
       throw new TypeError(`Input does not meet YAML 1.2 "Core Schema" specification: ${name}
@@ -19664,7 +19664,7 @@ var VersionType = /* @__PURE__ */ ((VersionType2) => {
 })(VersionType || {});
 
 // src/artifact/index.ts
-var import_core2 = __toESM(require_core());
+var import_core3 = __toESM(require_core());
 var import_exec3 = __toESM(require_exec());
 var import_github3 = __toESM(require_github());
 
@@ -19710,6 +19710,10 @@ var import_exec2 = __toESM(require_exec());
 var import_github2 = __toESM(require_github());
 var import_fs = require("fs");
 var import_path = require("path");
+var import_core2 = __toESM(require_core());
+var artifactProperties = (0, import_core2.getInput)("artifact-properties", {
+  required: false,
+});
 var deploy = (props) =>
   __async(void 0, null, function* () {
     const startTime = new Date();
@@ -19723,14 +19727,26 @@ var deploy = (props) =>
       filesToUpload,
     } = props;
     const artifactUploadResponses = [];
+    const credentialStr = generateCurlCredential({
+      artifactPassword: artifactPassword2,
+      artifactUsername: artifactUsername2,
+      artifactToken: artifactToken2,
+    });
     for (const i in filesToUpload) {
+      const artifactUrl = `${artifactHost2}/${artifactPath2}/${revision}/${filesToUpload[i]}`;
       const output = yield (0, import_exec2.getExecOutput)(
-        `curl -X PUT -H "Authorization: Bearer ${artifactToken2}" ${artifactHost2}/${artifactPath2}/${revision}/${filesToUpload[i]} -T ${filesToUpload[i]}`
+        `curl -X PUT ${credentialStr} ${artifactUrl} -T ${filesToUpload[i]}`
       );
       if (output.stdout) {
         artifactUploadResponses.push({
           filename: filesToUpload[i],
           response: JSON.parse(output.stdout),
+        });
+        yield addPropertiesToArtifact({
+          artifactUsername: artifactUsername2,
+          artifactPassword: artifactPassword2,
+          artifactToken: artifactToken2,
+          artifactUrl,
         });
       }
     }
@@ -19752,6 +19768,43 @@ var deploy = (props) =>
       },
       artifactHost2
     );
+  });
+var addPropertiesToArtifact = (props) =>
+  __async(void 0, null, function* () {
+    if (artifactProperties) {
+      const {
+        artifactPassword: artifactPassword2,
+        artifactUsername: artifactUsername2,
+        artifactToken: artifactToken2,
+        artifactUrl,
+      } = props;
+      const credentialStr = generateCurlCredential({
+        artifactPassword: artifactPassword2,
+        artifactUsername: artifactUsername2,
+        artifactToken: artifactToken2,
+      });
+      const artifactPropertiesArr = artifactProperties.split(",");
+      const properties = {};
+      artifactPropertiesArr.forEach((propStr) => {
+        const propArr = propStr.split("=");
+        if (Array.isArray(propArr) && propArr.length > 1) {
+          properties[propArr[0]] = propArr[1];
+        }
+      });
+      const output = yield (0, import_exec2.getExecOutput)(
+        `curl -X PUT ${credentialStr} ${artifactUrl} -d ${JSON.stringify(
+          properties
+        )}`
+      );
+      if (output.stdout) {
+        console.log(
+          `[addPropertiesToArtifact] successfully added properties to artifact.`
+        );
+        console.debug(
+          `[addPropertiesToArtifact] ${JSON.stringify(properties)}`
+        );
+      }
+    }
   });
 var createBuildInfoModuleArtifacts = (props) => {
   const { artifactUploadResponses } = props;
@@ -19825,37 +19878,37 @@ var uploadBuildInfo = (credentials, artifactHost2) =>
 // src/artifact/index.ts
 var import_fs2 = require("fs");
 var import_exec4 = __toESM(require_exec());
-var artifactRepo = (0, import_core2.getInput)("artifact-repo", {
+var artifactRepo = (0, import_core3.getInput)("artifact-repo", {
   required: false,
 });
-var artifactToken = (0, import_core2.getInput)("artifact-token", {
+var artifactToken = (0, import_core3.getInput)("artifact-token", {
   required: false,
 });
-var artifactUsername = (0, import_core2.getInput)("artifact-username", {
+var artifactUsername = (0, import_core3.getInput)("artifact-username", {
   required: false,
 });
-var artifactPassword = (0, import_core2.getInput)("artifact-password", {
+var artifactPassword = (0, import_core3.getInput)("artifact-password", {
   required: false,
 });
-var artifactHost = (0, import_core2.getInput)("artifact-host", {
+var artifactHost = (0, import_core3.getInput)("artifact-host", {
   required: true,
 });
-var artifactPath = (0, import_core2.getInput)("artifact-path", {
+var artifactPath = (0, import_core3.getInput)("artifact-path", {
   required: true,
 });
-var pushSource = (0, import_core2.getInput)("push-source", {
+var pushSource = (0, import_core3.getInput)("push-source", {
   required: false,
 });
-var mainBranch = (0, import_core2.getInput)("main-branch", {
+var mainBranch = (0, import_core3.getInput)("main-branch", {
   required: false,
 });
-var artifactPostfix = (0, import_core2.getInput)("artifact-postfix", {
+var artifactPostfix = (0, import_core3.getInput)("artifact-postfix", {
   required: false,
 });
-var packagerType = (0, import_core2.getInput)("packager-type", {
+var packagerType = (0, import_core3.getInput)("packager-type", {
   required: false,
 });
-var extraArtifactFiles = (0, import_core2.getInput)("extra-artifact-files", {
+var extraArtifactFiles = (0, import_core3.getInput)("extra-artifact-files", {
   required: false,
 });
 var uploadArtifact = (repoName, revision) =>
@@ -19927,8 +19980,8 @@ var uploadArtifact = (repoName, revision) =>
         revision,
         buildArtifactFilename,
       });
-      (0, import_core2.setOutput)("artifact-url", artifactUrl);
-      (0, import_core2.setOutput)("revision", revision);
+      (0, import_core3.setOutput)("artifact-url", artifactUrl);
+      (0, import_core3.setOutput)("revision", revision);
     }
   });
 var pushSourceToRepo = (isPushSource, props) =>
