@@ -112,7 +112,7 @@ const addPropertiesToArtifact = async (props: ArtifactMetadata) => {
       const propArr = propStr.split("=");
 
       if (Array.isArray(propArr) && propArr.length > 1) {
-        properties[propArr[0]] = propArr[1];
+        properties[`"${propArr[0]}"`] = `"${propArr[1]}"`;
       }
     });
 

@@ -19792,7 +19792,7 @@ var addPropertiesToArtifact = (props) =>
       artifactPropertiesArr.forEach((propStr) => {
         const propArr = propStr.split("=");
         if (Array.isArray(propArr) && propArr.length > 1) {
-          properties[propArr[0]] = propArr[1];
+          properties[`"${propArr[0]}"`] = `"${propArr[1]}"`;
         }
       });
       const artifactUrl = `${artifactHost2}/api/metadata/${artifactPath2}/${file}`;
