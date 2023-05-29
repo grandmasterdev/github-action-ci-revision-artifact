@@ -50,6 +50,18 @@ export const generateArtifactUrl = (props: GenerateArtifactUrl) => {
   return `${artifactHost}/${artifactPath}/${revision}/${buildArtifactFilename}`;
 };
 
+/**
+ *
+ * @param jsonObject
+ */
+export const parseJsonToCurl = (jsonObject: Record<string, unknown>) => {
+  if (!jsonObject) {
+    throw new Error(`[parseJsonToCurl] missing jsonObject argument!`);
+  }
+
+  return JSON.stringify(jsonObject);
+};
+
 export interface CurlCredentialProps {
   artifactToken?: string;
   artifactUsername?: string;

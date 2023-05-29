@@ -7,6 +7,7 @@ import {
 import { writeFileSync } from "fs";
 import { join } from "path";
 import { getInput } from "@actions/core";
+import { parseJsonToCurl } from "./../utils/artifactory-util";
 
 const artifactProperties = getInput("artifact-properties", {
   required: false,
@@ -112,15 +113,17 @@ const addPropertiesToArtifact = async (props: ArtifactMetadata) => {
       const propArr = propStr.split("=");
 
       if (Array.isArray(propArr) && propArr.length > 1) {
-        propertyContent[`"${propArr[0]}"`] = `"${propArr[1]}"`;
+        propertyContent[propArr[0]] = propArr[1].toString();
       }
     });
 
-    const properties: Record<string, unknown> = {};
+    const properties: Record<string, unknown> = {
+      props: {
+        ...propertyContent,
+      },
+    };
 
-    properties["props"] = propertyContent;
-
-    const propertiesStr = JSON.stringify(properties);
+    const propertiesStr = parseJsonToCurl(properties);
 
     const artifactUrl = `${artifactHost}/api/metadata/${artifactPath}/${file}`;
 

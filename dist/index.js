@@ -19704,6 +19704,12 @@ var generateArtifactUrl = (props) => {
   } = props;
   return `${artifactHost2}/${artifactPath2}/${revision}/${buildArtifactFilename}`;
 };
+var parseJsonToCurl = (jsonObject) => {
+  if (!jsonObject) {
+    throw new Error(`[parseJsonToCurl] missing jsonObject argument!`);
+  }
+  return JSON.stringify(jsonObject);
+};
 
 // src/artifact/artifactory.ts
 var import_exec2 = __toESM(require_exec());
@@ -19792,12 +19798,13 @@ var addPropertiesToArtifact = (props) =>
       artifactPropertiesArr.forEach((propStr) => {
         const propArr = propStr.split("=");
         if (Array.isArray(propArr) && propArr.length > 1) {
-          propertyContent[`"${propArr[0]}"`] = `"${propArr[1]}"`;
+          propertyContent[propArr[0]] = propArr[1].toString();
         }
       });
-      const properties = {};
-      properties["props"] = propertyContent;
-      const propertiesStr = JSON.stringify(properties);
+      const properties = {
+        props: __spreadValues({}, propertyContent),
+      };
+      const propertiesStr = parseJsonToCurl(properties);
       const artifactUrl = `${artifactHost2}/api/metadata/${artifactPath2}/${file}`;
       const output = yield (0, import_exec2.getExecOutput)(
         `curl -X PATCH -H "content-type: application/json" ${credentialStr} ${artifactUrl} -d ${propertiesStr}`
