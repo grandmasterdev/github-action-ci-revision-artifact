@@ -19797,7 +19797,7 @@ var addPropertiesToArtifact = (props) =>
       });
       const artifactUrl = `${artifactHost2}/api/metadata/${artifactPath2}/${file}`;
       const output = yield (0, import_exec2.getExecOutput)(
-        `curl -X PUT ${credentialStr} ${artifactUrl} -d ${JSON.stringify(
+        `curl -X PATCH ${credentialStr} ${artifactUrl} -d ${JSON.stringify(
           properties
         )}`
       );
