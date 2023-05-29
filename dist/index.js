@@ -19795,21 +19795,18 @@ var addPropertiesToArtifact = (props) =>
           properties[`"${propArr[0]}"`] = `"${propArr[1]}"`;
         }
       });
+      const propertiesStr = JSON.stringify({
+        props: __spreadValues({}, properties),
+      });
       const artifactUrl = `${artifactHost2}/api/metadata/${artifactPath2}/${file}`;
       const output = yield (0, import_exec2.getExecOutput)(
-        `curl -X PATCH -H "content-type: application/json" ${credentialStr} ${artifactUrl} -d ${JSON.stringify(
-          {
-            props: __spreadValues({}, properties),
-          }
-        )}`
+        `curl -X PATCH -H "content-type: application/json" ${credentialStr} ${artifactUrl} -d ${propertiesStr}`
       );
       if (output.stdout) {
         console.log(
           `[addPropertiesToArtifact] successfully added properties to artifact.`
         );
-        console.debug(
-          `[addPropertiesToArtifact] ${JSON.stringify(properties)}`
-        );
+        console.debug(`[addPropertiesToArtifact] ${propertiesStr}`);
       }
     }
   });
