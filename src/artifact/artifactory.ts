@@ -106,7 +106,7 @@ const addPropertiesToArtifact = async (props: ArtifactMetadata) => {
 
     const artifactPropertiesArr = artifactProperties.split(",");
 
-    const properties: Record<string, string> = {};
+    const propertyContent: Record<string, string> = {};
 
     artifactPropertiesArr.forEach((propStr) => {
       const propArr = propStr.split("=");
@@ -116,23 +116,21 @@ const addPropertiesToArtifact = async (props: ArtifactMetadata) => {
       }
     });
 
-    const propertiesStr = JSON.stringify({
-      props: {
-        ...properties,
-      },
-    });
+    const properties: Record<string, unknown> = {};
+
+    properties["props"] = propertyContent;
 
     const artifactUrl = `${artifactHost}/api/metadata/${artifactPath}/${file}`;
 
     const output = await getExecOutput(
-      `curl -X PATCH -H "content-type: application/json" ${credentialStr} ${artifactUrl} -d ${propertiesStr}`
+      `curl -X PATCH -H "content-type: application/json" ${credentialStr} ${artifactUrl} -d ${properties}`
     );
 
     if (output.stdout) {
       console.log(
         `[addPropertiesToArtifact] successfully added properties to artifact.`
       );
-      console.debug(`[addPropertiesToArtifact] ${propertiesStr}`);
+      console.debug(`[addPropertiesToArtifact] ${properties}`);
     }
   }
 };

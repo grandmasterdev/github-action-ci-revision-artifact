@@ -19788,25 +19788,24 @@ var addPropertiesToArtifact = (props) =>
         artifactToken: artifactToken2,
       });
       const artifactPropertiesArr = artifactProperties.split(",");
-      const properties = {};
+      const propertyContent = {};
       artifactPropertiesArr.forEach((propStr) => {
         const propArr = propStr.split("=");
         if (Array.isArray(propArr) && propArr.length > 1) {
           properties[`"${propArr[0]}"`] = `"${propArr[1]}"`;
         }
       });
-      const propertiesStr = JSON.stringify({
-        props: __spreadValues({}, properties),
-      });
+      const properties = {};
+      properties["props"] = propertyContent;
       const artifactUrl = `${artifactHost2}/api/metadata/${artifactPath2}/${file}`;
       const output = yield (0, import_exec2.getExecOutput)(
-        `curl -X PATCH -H "content-type: application/json" ${credentialStr} ${artifactUrl} -d ${propertiesStr}`
+        `curl -X PATCH -H "content-type: application/json" ${credentialStr} ${artifactUrl} -d ${properties}`
       );
       if (output.stdout) {
         console.log(
           `[addPropertiesToArtifact] successfully added properties to artifact.`
         );
-        console.debug(`[addPropertiesToArtifact] ${propertiesStr}`);
+        console.debug(`[addPropertiesToArtifact] ${properties}`);
       }
     }
   });
