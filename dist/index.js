@@ -19708,7 +19708,7 @@ var parseJsonToCurl = (jsonObject) => {
   if (!jsonObject) {
     throw new Error(`[parseJsonToCurl] missing jsonObject argument!`);
   }
-  return JSON.stringify(jsonObject);
+  return JSON.stringify(JSON.stringify(jsonObject));
 };
 
 // src/artifact/artifactory.ts

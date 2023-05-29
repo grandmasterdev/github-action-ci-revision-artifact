@@ -59,7 +59,7 @@ export const parseJsonToCurl = (jsonObject: Record<string, unknown>) => {
     throw new Error(`[parseJsonToCurl] missing jsonObject argument!`);
   }
 
-  return JSON.stringify(jsonObject);
+  return JSON.stringify(JSON.stringify(jsonObject));
 };
 
 export interface CurlCredentialProps {
