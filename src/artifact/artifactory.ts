@@ -119,9 +119,13 @@ const addPropertiesToArtifact = async (props: ArtifactMetadata) => {
     const artifactUrl = `${artifactHost}/api/metadata/${artifactPath}/${file}`;
 
     const output = await getExecOutput(
-      `curl -X PATCH -H "content-type: application/json" ${credentialStr} ${artifactUrl} -d '${JSON.stringify(
-        properties
-      )}'`
+      `curl -X PATCH -H "content-type: application/json" ${credentialStr} ${artifactUrl} -d ${JSON.stringify(
+        {
+          props: {
+            ...properties,
+          },
+        }
+      )}`
     );
 
     if (output.stdout) {
