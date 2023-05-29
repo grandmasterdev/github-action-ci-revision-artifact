@@ -32,6 +32,9 @@ inputs:
   artifact-password:
     description: 'The artifact repo service password. Not needed if token is set'
     required: false
+  artifact-properties:
+    description: 'Tags for the artifact file should it is needed'
+    required: false
   push-source:
     description: 'Include the source codes into the artifact'
     required: false
