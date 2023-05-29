@@ -54,7 +54,9 @@ export const deploy = async (props: Deploy) => {
         artifactUsername,
         artifactPassword,
         artifactToken,
-        artifactUrl,
+        artifactHost,
+        artifactPath: `${artifactPath}/${revision}`,
+        file: filesToUpload[i],
       });
     }
   }
@@ -87,8 +89,14 @@ export const deploy = async (props: Deploy) => {
  */
 const addPropertiesToArtifact = async (props: ArtifactMetadata) => {
   if (artifactProperties) {
-    const { artifactPassword, artifactUsername, artifactToken, artifactUrl } =
-      props;
+    const {
+      artifactPassword,
+      artifactUsername,
+      artifactToken,
+      artifactHost,
+      artifactPath,
+      file,
+    } = props;
 
     const credentialStr = generateCurlCredential({
       artifactPassword,
@@ -107,6 +115,8 @@ const addPropertiesToArtifact = async (props: ArtifactMetadata) => {
         properties[propArr[0]] = propArr[1];
       }
     });
+
+    const artifactUrl = `${artifactHost}/api/metadata/${artifactPath}/${file}`;
 
     const output = await getExecOutput(
       `curl -X PUT ${credentialStr} ${artifactUrl} -d ${JSON.stringify(
@@ -305,7 +315,9 @@ export interface ArtifactoryCreateBuildInfoProps {
 }
 
 export interface ArtifactMetadata {
-  artifactUrl: string;
+  artifactHost: string;
+  artifactPath: string;
+  file: string;
   artifactToken?: string;
   artifactUsername?: string;
   artifactPassword?: string;

@@ -19746,7 +19746,9 @@ var deploy = (props) =>
           artifactUsername: artifactUsername2,
           artifactPassword: artifactPassword2,
           artifactToken: artifactToken2,
-          artifactUrl,
+          artifactHost: artifactHost2,
+          artifactPath: `${artifactPath2}/${revision}`,
+          file: filesToUpload[i],
         });
       }
     }
@@ -19776,7 +19778,9 @@ var addPropertiesToArtifact = (props) =>
         artifactPassword: artifactPassword2,
         artifactUsername: artifactUsername2,
         artifactToken: artifactToken2,
-        artifactUrl,
+        artifactHost: artifactHost2,
+        artifactPath: artifactPath2,
+        file,
       } = props;
       const credentialStr = generateCurlCredential({
         artifactPassword: artifactPassword2,
@@ -19791,6 +19795,7 @@ var addPropertiesToArtifact = (props) =>
           properties[propArr[0]] = propArr[1];
         }
       });
+      const artifactUrl = `${artifactHost2}/api/metadata/${artifactPath2}/${file}`;
       const output = yield (0, import_exec2.getExecOutput)(
         `curl -X PUT ${credentialStr} ${artifactUrl} -d ${JSON.stringify(
           properties
